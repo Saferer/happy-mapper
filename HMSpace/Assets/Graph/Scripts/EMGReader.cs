@@ -279,7 +279,7 @@ namespace I4HUSB
                         for (int j = 0; j < channels.Length; j += 2)
                         {
                             channels[j] = transform((int)(packetBytes[j + 4] << 8 | packetBytes[j + 5]));
-                            average += channels[j;
+                            average += channels[j];
                         }
 
                         /*

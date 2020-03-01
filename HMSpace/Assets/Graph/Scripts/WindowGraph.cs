@@ -56,6 +56,7 @@ public class WindowGraph : MonoBehaviour
 
 
                 dashMaxInst.anchoredPosition = new Vector2(0, (yPos - yMinimum) / (yMaximum - yMinimum) * graphContainer.sizeDelta.y);
+                StaticEMG.Instance.EMG.setGoal(yPos);
             }
             
         }
