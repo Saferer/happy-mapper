@@ -21,7 +21,7 @@ namespace I4HUSB
         SerialPort serialPort;
         private bool keepRunning = true;
         private double AVERAGE_PERIOD = 0.2;  // seconds
-        private double RATE = 252; // hz
+        private double RATE = 252f; // hz
         private double CALIBRATION_TIME = 5; //seconds
 
         //Constructor
@@ -36,7 +36,7 @@ namespace I4HUSB
             serialPort.Open();
             packetBytes = new int[17];
 
-            int size = Math.Round(RATE * AVERAGE_PERIOD);
+            int size = (int) Math.Round(RATE * AVERAGE_PERIOD);
             pastValues = new double[size];
         }
 
@@ -248,7 +248,8 @@ namespace I4HUSB
         public double[] getCalibrationArray()
         {
             serialPort.DiscardInBuffer();
-            double[] runningArray = new double[CALIBRATION_TIME*RATE];
+            int rounded = (int) Math.Round(CALIBRATION_TIME * RATE);
+            double[] runningArray = new double[rounded];
             int currentIndex = 0;
             for (int i = 0; i < CALIBRATION_TIME * RATE; i++)
             {
@@ -275,10 +276,10 @@ namespace I4HUSB
                     {
                         double[] channels = new double[6];
                         double average = 0;
-                        for (int i = 0; i < channels.Length; i += 2)
+                        for (int j = 0; j < channels.Length; j += 2)
                         {
-                            channels[i] = transform((int)(packetBytes[i + 4] << 8 | packetBytes[i + 5]));
-                            average += channels[i];
+                            channels[j] = transform((int)(packetBytes[j + 4] << 8 | packetBytes[j + 5]));
+                            average += channels[j;
                         }
 
                         /*

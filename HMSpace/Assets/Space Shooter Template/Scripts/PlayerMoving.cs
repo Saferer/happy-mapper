@@ -40,7 +40,7 @@ public class PlayerMoving : MonoBehaviour {
     {
         mainCamera = Camera.main;
         ResizeBorders();                //setting 'Player's' moving borders deending on Viewport's size
-        StaticEMG.Instance.EMG.setMax(55);
+        StaticEMG.Instance.EMG.setGoal(55);
         StaticEMG.Run();
     }
 
