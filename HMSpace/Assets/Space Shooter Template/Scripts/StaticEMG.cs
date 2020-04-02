@@ -18,8 +18,8 @@ public class StaticEMG : MonoBehaviour
     }
 
     public static StaticEMG Instance { get { return instance; } }
-
     public EMGReader EMG { get { return emg; } }
+
     private void Awake()
     {
         if (instance != null && instance != this)

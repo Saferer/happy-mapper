@@ -32,7 +32,7 @@ public class WindowGraph : MonoBehaviour
         List<int> valueList = new List<int>() { 0, 100, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20, 99, 20, 56, 30, 22, 88, 77, 13, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20
         , 100, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20, 99, 20, 56, 30, 22, 88, 77, 13, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20
         , 100, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20, 99, 20, 56, 30, 22, 88, 77, 13, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20};
-
+        
         ShowGraph(valueList);
 
     }
@@ -53,10 +53,9 @@ public class WindowGraph : MonoBehaviour
                     dashMaxInst.SetParent(graphContainer, false);
                     dashMaxInst.gameObject.SetActive(true);
                 }
-
+                StaticEMG.Instance.EMG.setGoal(yPos);
 
                 dashMaxInst.anchoredPosition = new Vector2(0, (yPos - yMinimum) / (yMaximum - yMinimum) * graphContainer.sizeDelta.y);
-                StaticEMG.Instance.EMG.setGoal(yPos);
             }
             
         }

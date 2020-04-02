@@ -29,15 +29,18 @@ namespace I4HUSB
         {
 
             //initializeProgram();
-            serialPort = new SerialPort("/dev/cu.usbmodem14201", 57600, Parity.None);
+            
+            serialPort = new SerialPort("COM6", 57600, Parity.None);
             if (serialPort.IsOpen){
               serialPort.Close();
             }
             serialPort.Open();
+            
             packetBytes = new int[17];
 
             int size = (int) Math.Round(RATE * AVERAGE_PERIOD);
             pastValues = new double[size];
+            
         }
 
         //Run this code on a serperate thread. This already loops so do not need to run this in loop
