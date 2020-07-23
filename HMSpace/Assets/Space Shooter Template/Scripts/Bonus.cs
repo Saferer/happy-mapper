@@ -9,7 +9,7 @@ using UnityEngine;
 //enumerating of bonuses types
 public enum BonusType
 {
-    levelup, short_Lazer, rocket, swirling, ray
+    levelup, short_Lazer, rocket, /*swirling,*/ ray
 }
 
 public class Bonus : MonoBehaviour {
@@ -40,10 +40,10 @@ public class Bonus : MonoBehaviour {
                     PlayerShooting.instance.activeShootingMode = ActiveShootingMode.Rocket;
                     SoundManager.instance.PlaySound("powerUp");
                     break;
-                case BonusType.swirling:
+                /*case BonusType.swirling:
                     PlayerShooting.instance.activeShootingMode = ActiveShootingMode.Swirling;
                     SoundManager.instance.PlaySound("powerUp");
-                    break;
+                    break;*/
                 case BonusType.ray:
                     SoundManager.instance.PlaySound("ray");     //play sound from 'SoundManager'
                     PlayerShooting.instance.activeShootingMode = ActiveShootingMode.Ray;
