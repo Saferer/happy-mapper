@@ -16,10 +16,10 @@ public class ShipSkins
 
 //Images for every stage of health bar on Main Canvas
 [System.Serializable]
-public class HealthIndicators
+/*public class HealthIndicators
 {
     public Sprite health_0, health_1, health_2, health_3;
-}
+}*/
 
 public class Player : MonoBehaviour
 {
@@ -32,7 +32,7 @@ public class Player : MonoBehaviour
 
 
     public ShipSkins shipSkins;
-    public HealthIndicators healthIndicatorsSprites;
+    //public HealthIndicators healthIndicatorsSprites;
 
     [Tooltip("Object 'Shield' of the 'Player' located in his hierarchy")]
     public GameObject shield;
@@ -56,14 +56,14 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        healthIndicatorImage = GameObject.FindWithTag("Health").GetComponent<Image>();  //set the health to 3 and update the health bar
+        /*healthIndicatorImage = GameObject.FindWithTag("Health").GetComponent<Image>();  //set the health to 3 and update the health bar
         health = 3;
         UpdateHealthIndicator();
-        UpdateSkin();
+        UpdateSkin();*/
     }
 
     //method for damage proceccing by 'Player'
-    public void GetDamage(int damage)   
+    /*public void GetDamage(int damage)   
     {
         if (Time.time > nextDamage)     //checking if the time comes for the new damage, and if it does, decreasing health and setting the new time
         {
@@ -78,10 +78,10 @@ public class Player : MonoBehaviour
                 shield.SetActive(true);
             }
         }
-    }
+    }*/
     
     //depending on 'Player's' health, refreshing health bar for a needed sprite
-    void UpdateHealthIndicator()
+    /*void UpdateHealthIndicator()
     {
         switch (health)
         {
@@ -98,7 +98,7 @@ public class Player : MonoBehaviour
                 healthIndicatorImage.sprite = healthIndicatorsSprites.health_3;
                 break;
         }
-    }
+    }*/
 
     //'Player's' destruction procedure
     void Destruction()

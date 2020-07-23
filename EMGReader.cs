@@ -275,10 +275,10 @@ namespace I4HUSB
                     {
                         double[] channels = new double[6];
                         double average = 0;
-                        for (int i = 0; i < channels.Length; i += 2)
+                        for (int j= 0; j < channels.Length; j+= 2)
                         {
-                            channels[i] = transform((int)(packetBytes[i + 4] << 8 | packetBytes[i + 5]));
-                            average += channels[i];
+                            channels[j]= transform((int)(packetBytes[j+ 4] << 8 | packetBytes[j+ 5]));
+                            average += channels[j;
                         }
 
                         /*

@@ -22,9 +22,13 @@ public class GameController : MonoBehaviour {
 
     Text scoreText;     //text displayed in 'Score' field to 'Main Canvas'
     Text coinsText;
+    Text timeText;
 
     int score;
     int coins;
+    int mins;
+    int secs;
+    float CurrentTime;
 
     public GameObject gameOverScreen;
     public Text finalScoreText;
@@ -53,6 +57,7 @@ public class GameController : MonoBehaviour {
             instance = this;
         scoreText = GameObject.FindWithTag("Score").GetComponent<Text>();
         coinsText = GameObject.FindWithTag("CoinsText").GetComponent<Text>();
+        timeText = GameObject.FindWithTag("TimeText").GetComponent<Text>();
         gameOverScreen.SetActive(false);
 
         if (ChooseShipAtStart)
@@ -67,8 +72,21 @@ public class GameController : MonoBehaviour {
         scoreText.text = score.ToString();
         coins = 0;
         coinsText.text = coins.ToString();
+        CurrentTime = 0f;
+        timeText.text = "0:0";
 
 
+    }
+
+    public void Update()
+    {
+        float t = CurrentTime += 1 * Time.deltaTime;
+
+        mins = ((int)t / 60);
+        secs = Mathf.RoundToInt(t % 60);
+        if (secs == 60)
+            secs = 0;
+        timeText.text = mins.ToString() + ":" + secs.ToString();
     }
 
     public void AddScore(int count)     //updating 'Score' and display on 'Main Canvas'
