@@ -11,7 +11,9 @@ public class ButtonHandler : MonoBehaviour
   bool pressed = false;
 
   public void changeScene(GameObject percentage){
-    if (pressed == false){StaticEMG.Instance.EMG.setMax(45);}
+    if (pressed == false){
+            //StaticEMG.Instance.EMG.setMax(45);
+        }
     MapState.CurrentLevel = 0;
     MapState.Location = new Vector2(-2.1f, 0.89f);
     MapState.NumPressed = 0;
@@ -25,7 +27,7 @@ public class ButtonHandler : MonoBehaviour
   public void calibrate(){
     pressed = true;
     StaticEMG.Stop();
-    StaticEMG.Instance.EMG.calibrateMax();
+   // StaticEMG.Instance.EMG.calibrateMax();
     StaticEMG.Run();
   }
 

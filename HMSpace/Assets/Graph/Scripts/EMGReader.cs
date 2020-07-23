@@ -30,7 +30,7 @@ namespace I4HUSB
 
             //initializeProgram();
             
-            serialPort = new SerialPort("COM6", 57600, Parity.None);
+            serialPort = new SerialPort(SerialPort.GetPortNames()[0], 57600, Parity.None);
             if (serialPort.IsOpen){
               serialPort.Close();
             }
