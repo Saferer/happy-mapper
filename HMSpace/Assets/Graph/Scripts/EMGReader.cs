@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO.Ports;
+using System.IO;
 
 
 namespace I4HUSB
@@ -29,24 +30,29 @@ namespace I4HUSB
         {
 
             //initializeProgram();
-            
-            serialPort = new SerialPort(SerialPort.GetPortNames()[0], 57600, Parity.None);
-            if (serialPort.IsOpen){
-              serialPort.Close();
+            var portNames = SerialPort.GetPortNames();
+            Debug.Log(portNames.Length);
+            foreach (var name in portNames)
+            {
+                Debug.Log(name);
             }
-            serialPort.Open();
-            
+            serialPort = new SerialPort("COM6", 57600, Parity.None);
+            if (!serialPort.IsOpen)
+            {
+                serialPort.Open();
+            }
+
             packetBytes = new int[17];
 
-            int size = (int) Math.Round(RATE * AVERAGE_PERIOD);
+            int size = (int)Math.Round(RATE * AVERAGE_PERIOD);
             pastValues = new double[size];
-            
+
         }
 
         //Run this code on a serperate thread. This already loops so do not need to run this in loop
         public void run()
         {
-            while(keepRunning)
+            while (keepRunning)
             {
                 while (true)
                 {
@@ -70,9 +76,9 @@ namespace I4HUSB
                     {
                         double[] channels = new double[6];
                         double average = 0;
-                        for (int i = 0; i < channels.Length; i+=2)
+                        for (int i = 0; i < channels.Length; i += 2)
                         {
-                            channels[i] = transform((int)(packetBytes[i+4] << 8 | packetBytes[i+5]));
+                            channels[i] = transform((int)(packetBytes[i + 4] << 8 | packetBytes[i + 5]));
                             average += channels[i];
                         }
 
@@ -92,7 +98,7 @@ namespace I4HUSB
                         {
                             pastIndex = 0;
                         }
-                        Console.WriteLine(getPercentage()); //comment this out later
+                        //Console.WriteLine(getPercentage()); //comment this out later
                         index = 2;
                         break;
                     }
@@ -251,7 +257,7 @@ namespace I4HUSB
         public double[] getCalibrationArray()
         {
             serialPort.DiscardInBuffer();
-            int rounded = (int) Math.Round(CALIBRATION_TIME * RATE);
+            int rounded = (int)Math.Round(CALIBRATION_TIME * RATE);
             double[] runningArray = new double[rounded];
             int currentIndex = 0;
             for (int i = 0; i < CALIBRATION_TIME * RATE; i++)
@@ -327,8 +333,9 @@ namespace I4HUSB
             this.max = max;
         }*/
 
-        public void setFlag(bool val){
-          this.keepRunning = val;
+        public void setFlag(bool val)
+        {
+            this.keepRunning = val;
         }
 
         public void setGoal(double goal)
@@ -336,8 +343,9 @@ namespace I4HUSB
             this.goal = goal;
         }
 
-        public void close(){
-          serialPort.Close();
+        public void close()
+        {
+            serialPort.Close();
         }
 
         //Main to test code
@@ -349,7 +357,7 @@ namespace I4HUSB
             //test.calibrateBase();
             Console.WriteLine("Done");
             Console.ReadLine();
-           // test.calibrateMax();
+            // test.calibrateMax();
             Console.WriteLine("Done");
             Console.ReadLine();
             test.run();

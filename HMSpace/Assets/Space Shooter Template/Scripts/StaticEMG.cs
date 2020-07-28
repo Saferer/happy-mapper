@@ -8,13 +8,13 @@ using System.Threading;
 public class StaticEMG : MonoBehaviour
 {
     private static StaticEMG instance = null;
-    private EMGReader emg;
+    private EMGReader emg = null;
     private static bool running = false;
     private static Thread childThread;
 
     private StaticEMG()
     {
-        emg = new EMGReader();
+
     }
 
     public static StaticEMG Instance { get { return instance; } }
@@ -22,6 +22,10 @@ public class StaticEMG : MonoBehaviour
 
     private void Awake()
     {
+        if (emg == null)
+        {
+            emg = new EMGReader();
+        }
         if (instance != null && instance != this)
         {
             Destroy(this.gameObject);
@@ -55,7 +59,9 @@ public class StaticEMG : MonoBehaviour
         }
     }
 
-    public void OnApplicationQuit(){
-      this.EMG.close();
+
+    public void OnApplicationQuit()
+    {
+        this.EMG.close();
     }
 }

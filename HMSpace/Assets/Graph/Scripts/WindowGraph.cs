@@ -22,6 +22,8 @@ public class WindowGraph : MonoBehaviour
 
     private void Awake()
     {
+
+
         graphContainer = transform.Find("graphContainer").GetComponent<RectTransform>();
         labelTemplateX = graphContainer.Find("labelTemplateX").GetComponent<RectTransform>();
         labelTemplateY = graphContainer.Find("labelTemplateY").GetComponent<RectTransform>();
@@ -29,23 +31,30 @@ public class WindowGraph : MonoBehaviour
         dashMaxTemplate = graphContainer.Find("dashMax").GetComponent<RectTransform>();
         gameObjectList = new List<GameObject>();
 
-        List<int> valueList = new List<int>() { 0, 100, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20, 99, 20, 56, 30, 22, 88, 77, 13, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20
-        , 100, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20, 99, 20, 56, 30, 22, 88, 77, 13, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20
-        , 100, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20, 99, 20, 56, 30, 22, 88, 77, 13, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20};
-        
-        ShowGraph(valueList);
+        // List<int> valueList = new List<int>() { 0, 100, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20, 99, 20, 56, 30, 22, 88, 77, 13, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20
+        // , 100, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20, 99, 20, 56, 30, 22, 88, 77, 13, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20
+        // , 100, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20, 99, 20, 56, 30, 22, 88, 77, 13, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20};
 
+
+
+    }
+
+    private void Start()
+    {
+        List<float> valueList = new List<float>(MathConversionUtil.DoubleArrayToFloat(StaticEMG.Instance.EMG.getCalibrationArray()));
+
+        ShowGraph(valueList);
     }
 
     private void Update()
     {
-        if(Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0))
         {
             Vector2 localPoint;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(graphContainer, Input.mousePosition, UICam, out localPoint);
             float yPos = (localPoint.y / graphContainer.sizeDelta.y) * (yMaximum - yMinimum) + yMinimum;
             Debug.Log(yPos);
-            if(yPos < yMaximum && yPos > yMinimum)
+            if (yPos < yMaximum && yPos > yMinimum)
             {
                 if (dashMaxInst == null)
                 {
@@ -54,12 +63,11 @@ public class WindowGraph : MonoBehaviour
                     dashMaxInst.gameObject.SetActive(true);
                 }
                 StaticEMG.Instance.EMG.setGoal(yPos);
-
                 dashMaxInst.anchoredPosition = new Vector2(0, (yPos - yMinimum) / (yMaximum - yMinimum) * graphContainer.sizeDelta.y);
             }
-            
+
         }
-        
+
     }
 
     private GameObject CreateCircle(Vector2 anchoredPosition)
@@ -75,8 +83,8 @@ public class WindowGraph : MonoBehaviour
         return gameObject;
 
     }
-    
-    private void ShowGraph(List<int> valueList, int maxVisibleValueAmount = -1)
+
+    private void ShowGraph(List<float> valueList, int maxVisibleValueAmount = -1)
     {
 
         float graphWidth = graphContainer.sizeDelta.x;
@@ -84,25 +92,25 @@ public class WindowGraph : MonoBehaviour
         yMaximum = valueList[0];
         yMinimum = valueList[0];
 
-        
-        if(maxVisibleValueAmount <= 0)
+
+        if (maxVisibleValueAmount <= 0)
         {
             maxVisibleValueAmount = valueList.Count;
         }
 
-        foreach(GameObject gameObject in gameObjectList)
+        foreach (GameObject gameObject in gameObjectList)
         {
             Destroy(gameObject);
 
         }
         gameObjectList.Clear();
 
-        
+
 
 
         for (int i = Mathf.Max(valueList.Count - maxVisibleValueAmount, 0); i < valueList.Count; i++)
         {
-            int value = valueList[i];
+            float value = valueList[i];
             if (value > yMaximum)
             {
                 yMaximum = value;
@@ -113,7 +121,7 @@ public class WindowGraph : MonoBehaviour
             }
         }
         float yDifference = yMaximum - yMinimum;
-        if(yDifference <= 0)
+        if (yDifference <= 0)
         {
             yDifference = 5f;
         }
@@ -123,15 +131,15 @@ public class WindowGraph : MonoBehaviour
 
 
         int xIndex = 0;
-        float xSize = graphWidth/(maxVisibleValueAmount + 1);
+        float xSize = graphWidth / (maxVisibleValueAmount + 1);
         GameObject lastCircle = null;
-        for(int i = Mathf.Max(valueList.Count - maxVisibleValueAmount, 0); i < valueList.Count; i++)
+        for (int i = Mathf.Max(valueList.Count - maxVisibleValueAmount, 0); i < valueList.Count; i++)
         {
             float xPosition = xSize + xIndex * xSize;
             float yPosition = ((valueList[i] - yMinimum) / (yMaximum - yMinimum)) * graphHeight;
             GameObject circle = CreateCircle(new Vector2(xPosition, yPosition));
             gameObjectList.Add(circle);
-            if(lastCircle != null)
+            if (lastCircle != null)
             {
                 GameObject gameObjectDotConnection = CreateDotConnection(lastCircle.GetComponent<RectTransform>().anchoredPosition, circle.GetComponent<RectTransform>().anchoredPosition);
                 gameObjectList.Add(gameObjectDotConnection);
