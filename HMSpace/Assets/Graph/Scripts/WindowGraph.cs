@@ -52,7 +52,7 @@ public class WindowGraph : MonoBehaviour
         {
             Vector2 localPoint;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(graphContainer, Input.mousePosition, UICam, out localPoint);
-            float yPos = (localPoint.y / graphContainer.sizeDelta.y) * (yMaximum - yMinimum) + yMinimum;
+            float yPos = ((localPoint.y) / graphContainer.sizeDelta.y) * (yMaximum - yMinimum) + yMinimum;
             Debug.Log(yPos);
             if (yPos < yMaximum && yPos > yMinimum)
             {
@@ -165,7 +165,7 @@ public class WindowGraph : MonoBehaviour
             labelY.gameObject.SetActive(true);
             float normalizedValue = j * 1f / separatorCount;
             labelY.anchoredPosition = new Vector2(-20f, normalizedValue * graphHeight);
-            labelY.GetComponent<Text>().text = Mathf.RoundToInt(yMinimum + (normalizedValue * (yMaximum - yMinimum))).ToString();
+            labelY.GetComponent<Text>().text = string.Format("{0:0.00}", yMinimum + (normalizedValue * (yMaximum - yMinimum)));
             labelY.localScale = new Vector2(1, 1);
             gameObjectList.Add(labelY.gameObject);
 
