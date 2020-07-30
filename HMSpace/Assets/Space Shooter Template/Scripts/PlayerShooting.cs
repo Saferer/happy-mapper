@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
 
 /// <summary>
 /// defines which shooting mode is activated. It defines characteristics of the shooting modes. Depending on the activated shooting mode, it makes a shot.
@@ -38,8 +41,16 @@ public class Guns
 }
 #endregion
 
+[System.Serializable]
+public class ChargingBar
+{
+    public Sprite charged_0, charged_1, charged_2, charged_3;
+}
+
 public class PlayerShooting : MonoBehaviour {
 
+    public float percentage = 50f; // To be set by the clinician (used only in level 2)
+    public float threshold = 10f;
     public ActiveShootingMode activeShootingMode;
 
     [Tooltip("current weapon power")]
@@ -47,6 +58,9 @@ public class PlayerShooting : MonoBehaviour {
     public int weaponPower = 1;
 
     public ShootingMode[] shootingModes;
+    public ChargingBar chargingBarSprites;
+    Image chargingBarImage;
+
 
     public Guns guns;
     bool shootingIsActive = true;
@@ -64,29 +78,90 @@ public class PlayerShooting : MonoBehaviour {
         guns.leftGunVFX = guns.leftGun.GetComponent<ParticleSystem>();
         guns.rightGunVFX = guns.rightGun.GetComponent<ParticleSystem>();
         guns.centralGunVFX = guns.centralGun.GetComponent<ParticleSystem>();
+        if (SceneManager.GetActiveScene().name == "Level2")
+        {
+            Debug.Log("ok");
+            if (!GameObject.Find("ChargingBar"))
+            {
+                Debug.Log("found");
+            }
+            chargingBarImage = GameObject.Find("ChargingBar").GetComponent<Image>();//set the health to 3 and update the health bar
+            chargingBarImage.sprite = chargingBarSprites.charged_0;
+            //StaticEMG.Instance.EMG.setMax(55);
+            //StaticEMG.Run();
+        }
     }
 
     private void Update()
     {
-        if (shootingIsActive)
+
+        if (SceneManager.GetActiveScene().name == "Demo_Scene")
         {
-            int mode = (int)activeShootingMode;  //defining active shooting mode index
-            if (mode == (int)ActiveShootingMode.Ray) //if active shooting mode is ray, making a shot at once; if not, checking if the time for the next shot comes
-                MakeAShot();
-            else if (mode == (int)ActiveShootingMode.Rocket) //if active shooting mode is rocket, shooting time depends on current weapon power
+            if (shootingIsActive)
             {
-                if (Time.time > shootingModes[mode].nextFire)   //making a shot and setting time for the next one
-                {
+                int mode = (int)activeShootingMode;  //defining active shooting mode index
+                if (mode == (int)ActiveShootingMode.Ray) //if active shooting mode is ray, making a shot at once; if not, checking if the time for the next shot comes
                     MakeAShot();
-                    shootingModes[mode].nextFire = Time.time + 4f / shootingModes[mode].fireRate / weaponPower;
+                else if (mode == (int)ActiveShootingMode.Rocket) //if active shooting mode is rocket, shooting time depends on current weapon power
+                {
+                    if (Time.time > shootingModes[mode].nextFire)   //making a shot and setting time for the next one
+                    {
+                        MakeAShot();
+                        shootingModes[mode].nextFire = Time.time + 4f / shootingModes[mode].fireRate / weaponPower;
+                    }
+                }
+                else
+                {
+                    if (Time.time > shootingModes[mode].nextFire)
+                    {
+                        MakeAShot();
+                        shootingModes[mode].nextFire = Time.time + 4f / shootingModes[mode].fireRate;
+                    }
                 }
             }
-            else
+        } 
+        if (SceneManager.GetActiveScene().name == "Level2")
+        {
+            Debug.Log("in shooting");
+            float actualMPercentage = 15f;// (float)StaticEMG.Instance.EMG.getPercentage();
+            Debug.Log(actualMPercentage);
+
+            switch (actualMPercentage)
             {
-                if (Time.time > shootingModes[mode].nextFire)
-                {
+                case float n when (n <= 0.2*percentage):
+                    chargingBarImage.sprite = chargingBarSprites.charged_0;
+                    break;
+                case float n when (n > 0.2 * percentage && n <= 0.5 * percentage):
+                    chargingBarImage.sprite = chargingBarSprites.charged_1;
+                    break;
+                case float n when (n > 0.5 * percentage && n <= 0.8 * percentage):
+                    chargingBarImage.sprite = chargingBarSprites.charged_2;
+                    break;
+                case float n when (n > 0.8 * percentage && n <= percentage + 0.2 * percentage):
+                    chargingBarImage.sprite = chargingBarSprites.charged_3;
+                    break;
+            }
+
+            if (actualMPercentage <= percentage + threshold && actualMPercentage >= percentage - threshold)
+            {
+                int mode = (int)activeShootingMode;  //defining active shooting mode index
+                if (mode == (int)ActiveShootingMode.Ray) //if active shooting mode is ray, making a shot at once; if not, checking if the time for the next shot comes
                     MakeAShot();
-                    shootingModes[mode].nextFire = Time.time + 4f / shootingModes[mode].fireRate;
+                else if (mode == (int)ActiveShootingMode.Rocket) //if active shooting mode is rocket, shooting time depends on current weapon power
+                {
+                    if (Time.time > shootingModes[mode].nextFire)   //making a shot and setting time for the next one
+                    {
+                        MakeAShot();
+                        shootingModes[mode].nextFire = Time.time + 4f / shootingModes[mode].fireRate / weaponPower;
+                    }
+                }
+                else
+                {
+                    if (Time.time > shootingModes[mode].nextFire)
+                    {
+                        MakeAShot();
+                        shootingModes[mode].nextFire = Time.time + 4f / shootingModes[mode].fireRate;
+                    }
                 }
             }
         }

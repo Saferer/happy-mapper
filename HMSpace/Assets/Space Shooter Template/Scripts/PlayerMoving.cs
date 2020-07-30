@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 /// <summary>
 /// This script defines the borders of ‘Player’s’ movement. Depending on the chosen handling type, it moves the ‘Player’ together with the pointer.
@@ -39,37 +41,45 @@ public class PlayerMoving : MonoBehaviour {
     private void Start()
     {
         mainCamera = Camera.main;
-        ResizeBorders();                //setting 'Player's' moving borders deending on Viewport's size
-        StaticEMG.Instance.EMG.setMax(55);
-        StaticEMG.Run();
+        ResizeBorders();//setting 'Player's' moving borders deending on Viewport's size
+        if (SceneManager.GetActiveScene().name == "Demo_Scene")
+        {
+            StaticEMG.Instance.EMG.setMax(55);
+            StaticEMG.Run();
+        }
     }
 
     private void Update()
     {
-      //new for player movement with EMG
-      float offset = 1f;
-      Debug.Log((float)StaticEMG.Instance.EMG.getPercentage());
-              float actualMove =  (float)StaticEMG.Instance.EMG.getPercentage();
+        //new for player movement with EMG
+        if (SceneManager.GetActiveScene().name == "Demo_Scene")
+        {
+            float offset = 1f;
+            Debug.Log((float)StaticEMG.Instance.EMG.getPercentage());
+            float actualMove = (float)StaticEMG.Instance.EMG.getPercentage();
 
 
             Debug.Log(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x);
-            //
-              if (actualMove < -(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x)/2){
 
-              GetComponent<Transform>().position=new Vector3((-(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x)/2)+offset, -7.5f, 0f);
+            if (actualMove < -(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x) / 2)
+            {
+
+                GetComponent<Transform>().position = new Vector3((-(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x) / 2) + offset, -7.5f, 0f);
 
             }
-              else if (actualMove < (background.GetComponent<SpriteRenderer>().sprite.bounds.size.x)/2 /*&& actualMove >- 6f*/){
-              //
+            else if (actualMove < (background.GetComponent<SpriteRenderer>().sprite.bounds.size.x) / 2 /*&& actualMove >- 6f*/)
+            {
                 //Debug.Log(actualMove);
-                GetComponent<Transform>().position= Vector3.Lerp(GetComponent<Transform>().position, new Vector3(actualMove, -7.5f, 0f), .1f);}
+                GetComponent<Transform>().position = Vector3.Lerp(GetComponent<Transform>().position, new Vector3(actualMove, -7.5f, 0f), .1f);
+            }
 
-                else {GetComponent<Transform>().position=new Vector3(((background.GetComponent<SpriteRenderer>().sprite.bounds.size.x)/2)-offset, -7.5f, 0f);}
+            else { GetComponent<Transform>().position = new Vector3(((background.GetComponent<SpriteRenderer>().sprite.bounds.size.x) / 2) - offset, -7.5f, 0f); }
+        }
 
 
-//Old code from original game
+            //Old code from original game
 
-        if (controlIsActive)
+            if (controlIsActive)
         {
 #if UNITY_STANDALONE || UNITY_EDITOR || UNITY_WEBGL   //if the current platform is not mobile, setting mouse handling
 
