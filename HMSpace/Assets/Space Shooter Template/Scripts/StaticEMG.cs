@@ -12,6 +12,7 @@ public class StaticEMG : MonoBehaviour
     private static bool running = false;
     private static Thread childThread;
 
+    public double debugValue = 0;
     private StaticEMG()
     {
 
@@ -24,7 +25,7 @@ public class StaticEMG : MonoBehaviour
     {
         if (emg == null)
         {
-            emg = new EMGReader();
+            emg = new EMGReader(true);
         }
         if (instance != null && instance != this)
         {
@@ -35,6 +36,11 @@ public class StaticEMG : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(this.gameObject);
         }
+    }
+
+    private void Update()
+    {
+        Instance.EMG.RunningAverage = debugValue;
     }
 
     public static void Run()

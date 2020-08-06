@@ -24,11 +24,11 @@ namespace I4HUSB
         private double AVERAGE_PERIOD = 0.2;  // seconds
         private double RATE = 252f; // hz
         private double CALIBRATION_TIME = 5; //seconds
-
+        private bool debugMode = false;
         //Constructor
-        public EMGReader()
+        public EMGReader(bool debug = false)
         {
-
+            debugMode = debug;
             //initializeProgram();
             var portNames = SerialPort.GetPortNames();
             Debug.Log(portNames.Length);
@@ -36,11 +36,15 @@ namespace I4HUSB
             {
                 Debug.Log(name);
             }
-            serialPort = new SerialPort("COM6", 57600, Parity.None);
-            if (!serialPort.IsOpen)
+            if (!debug)
             {
-                serialPort.Open();
+                serialPort = new SerialPort("COM6", 57600, Parity.None);
+                if (!serialPort.IsOpen)
+                {
+                    serialPort.Open();
+                }
             }
+
 
             packetBytes = new int[17];
 
@@ -52,58 +56,62 @@ namespace I4HUSB
         //Run this code on a serperate thread. This already loops so do not need to run this in loop
         public void run()
         {
-            while (keepRunning)
+            if (!debugMode)
             {
-                while (true)
+
+                while (keepRunning)
                 {
-                    packetBytes[0] = serialPort.ReadByte();
-                    if (packetBytes[0] == 0xa5)
+                    while (true)
                     {
-                        //Console.WriteLine("Found a5");
-                        packetBytes[1] = serialPort.ReadByte();
-                        if (packetBytes[1] == 0x5a)
+                        packetBytes[0] = serialPort.ReadByte();
+                        if (packetBytes[0] == 0xa5)
                         {
-                            //Console.WriteLine("Found 5a");
+                            //Console.WriteLine("Found a5");
+                            packetBytes[1] = serialPort.ReadByte();
+                            if (packetBytes[1] == 0x5a)
+                            {
+                                //Console.WriteLine("Found 5a");
+                                break;
+                            }
+
+                        }
+                    }
+                    while (true)
+                    {
+
+                        if (index > 16)
+                        {
+                            double[] channels = new double[6];
+                            double average = 0;
+                            for (int i = 0; i < channels.Length; i += 2)
+                            {
+                                channels[i] = transform((int)(packetBytes[i + 4] << 8 | packetBytes[i + 5]));
+                                average += channels[i];
+                            }
+
+                            /*
+                            Console.WriteLine(packetBytes[4] << 8 | packetBytes[5]);
+                            Console.WriteLine(packetBytes[6] << 8 | packetBytes[7]);
+                            Console.WriteLine(packetBytes[8] << 8 | packetBytes[9]);
+                            */
+                            average /= channels.Length;
+                            //max = average > max ? average : max;
+                            deletedValue = pastValues[pastIndex];
+
+                            pastValues[pastIndex++] = average;
+                            calculateRunningAverage(average);
+
+                            if (pastIndex >= pastValues.Length)
+                            {
+                                pastIndex = 0;
+                            }
+                            //Console.WriteLine(getPercentage()); //comment this out later
+                            index = 2;
                             break;
                         }
+                        packetBytes[index++] = serialPort.ReadByte();
 
                     }
-                }
-                while (true)
-                {
-
-                    if (index > 16)
-                    {
-                        double[] channels = new double[6];
-                        double average = 0;
-                        for (int i = 0; i < channels.Length; i += 2)
-                        {
-                            channels[i] = transform((int)(packetBytes[i + 4] << 8 | packetBytes[i + 5]));
-                            average += channels[i];
-                        }
-
-                        /*
-                        Console.WriteLine(packetBytes[4] << 8 | packetBytes[5]);
-                        Console.WriteLine(packetBytes[6] << 8 | packetBytes[7]);
-                        Console.WriteLine(packetBytes[8] << 8 | packetBytes[9]);
-                        */
-                        average /= channels.Length;
-                        //max = average > max ? average : max;
-                        deletedValue = pastValues[pastIndex];
-
-                        pastValues[pastIndex++] = average;
-                        calculateRunningAverage(average);
-
-                        if (pastIndex >= pastValues.Length)
-                        {
-                            pastIndex = 0;
-                        }
-                        //Console.WriteLine(getPercentage()); //comment this out later
-                        index = 2;
-                        break;
-                    }
-                    packetBytes[index++] = serialPort.ReadByte();
-
                 }
             }
             //Debug.Log(getPercentage());
@@ -348,6 +356,17 @@ namespace I4HUSB
             serialPort.Close();
         }
 
+        public double RunningAverage
+        {
+            get { return runningAverage; }
+            set
+            {
+                if (debugMode)
+                {
+                    runningAverage = value;
+                }
+            }
+        }
         //Main to test code
         public static void Main(string[] args)
         {

@@ -47,9 +47,10 @@ public class ChargingBar
     public Sprite charged_0, charged_1, charged_2, charged_3;
 }
 
-public class PlayerShooting : MonoBehaviour {
+public class PlayerShooting : MonoBehaviour
+{
 
-    public float percentage = 50f; // To be set by the clinician (used only in level 2)
+    public float percentage = 0.50f; // To be set by the clinician (used only in level 2)
     public float threshold = 10f;
     public ActiveShootingMode activeShootingMode;
 
@@ -87,8 +88,8 @@ public class PlayerShooting : MonoBehaviour {
             }
             chargingBarImage = GameObject.Find("ChargingBar").GetComponent<Image>();//set the health to 3 and update the health bar
             chargingBarImage.sprite = chargingBarSprites.charged_0;
-            //StaticEMG.Instance.EMG.setMax(55);
-            //StaticEMG.Run();
+            StaticEMG.Instance.EMG.setGoal(15);
+            StaticEMG.Run();
         }
     }
 
@@ -119,16 +120,16 @@ public class PlayerShooting : MonoBehaviour {
                     }
                 }
             }
-        } 
+        }
         if (SceneManager.GetActiveScene().name == "Level2")
         {
             Debug.Log("in shooting");
-            float actualMPercentage = 15f;// (float)StaticEMG.Instance.EMG.getPercentage();
-            Debug.Log(actualMPercentage);
+            float actualMPercentage = (float)StaticEMG.Instance.EMG.getPercentage();
+            Debug.Log(actualMPercentage + ":" + percentage);
 
             switch (actualMPercentage)
             {
-                case float n when (n <= 0.2*percentage):
+                case float n when (n <= 0.2 * percentage):
                     chargingBarImage.sprite = chargingBarSprites.charged_0;
                     break;
                 case float n when (n > 0.2 * percentage && n <= 0.5 * percentage):
