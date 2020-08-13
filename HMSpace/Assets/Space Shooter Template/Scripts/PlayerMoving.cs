@@ -55,26 +55,45 @@ public class PlayerMoving : MonoBehaviour
         //new for player movement with EMG
         if (SceneManager.GetActiveScene().name == "Demo_Scene")
         {
-            float offset = 1f;
-            Debug.Log((float)StaticEMG.Instance.EMG.getPercentage());
-            float actualMove = (float)StaticEMG.Instance.EMG.getPercentage();
+            float offset = 10.24f;
+            //Debug.Log((float)StaticEMG.Instance.EMG.getPercentage());
+            float actualMove = (float)(-(StaticEMG.Instance.EMG.getPercentage() * background.GetComponent<SpriteRenderer>().sprite.bounds.size.x)) / 2;
 
 
-            Debug.Log(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x);
+            Debug.Log(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2);
 
+            if (actualMove > background.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2)
+            {
+                GetComponent<Transform>().position = new Vector3(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2, -7.5f, 0);
+            }
+            else if (actualMove < -(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2))
+            {
+                GetComponent<Transform>().position = new Vector3(-(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2), -7.5f, 0);
+            }
+            else
+            {
+                GetComponent<Transform>().position = new Vector3(actualMove + offset, -7.5f, 0);
+            }
+
+
+            /*
             if (actualMove < -(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x) / 2)
             {
 
+                GetComponent<Transform>().position = new Vector3(actualMove, -7.5f, 0f);
                 GetComponent<Transform>().position = new Vector3((-(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x) / 2) + offset, -7.5f, 0f);
 
             }
-            else if (actualMove < (background.GetComponent<SpriteRenderer>().sprite.bounds.size.x) / 2 /*&& actualMove >- 6f*/)
+            else if (actualMove < (background.GetComponent<SpriteRenderer>().sprite.bounds.size.x) / 2 //&& actualMove >- 6f)
             {
-                //Debug.Log(actualMove);
+                Debug.Log(actualMove);
                 GetComponent<Transform>().position = Vector3.Lerp(GetComponent<Transform>().position, new Vector3(actualMove, -7.5f, 0f), .1f);
             }
 
-            else { GetComponent<Transform>().position = new Vector3(((background.GetComponent<SpriteRenderer>().sprite.bounds.size.x) / 2) - offset, -7.5f, 0f); }
+            else
+            { GetComponent<Transform>().position = new Vector3(((background.GetComponent<SpriteRenderer>().sprite.bounds.size.x) / 2) - offset, -7.5f, 0f); 
+            }
+            */
         }
 
 

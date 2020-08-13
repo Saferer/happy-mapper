@@ -13,6 +13,8 @@ public class StaticEMG : MonoBehaviour
     private static Thread childThread;
 
     public double debugValue = 0;
+
+    public double debugMaxGoalValue = 0;
     private StaticEMG()
     {
 
@@ -41,6 +43,7 @@ public class StaticEMG : MonoBehaviour
     private void Update()
     {
         Instance.EMG.RunningAverage = debugValue;
+        Instance.EMG.setGoal(debugMaxGoalValue);
     }
 
     public static void Run()
