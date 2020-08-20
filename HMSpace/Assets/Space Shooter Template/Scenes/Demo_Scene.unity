@@ -337,6 +337,11 @@ PrefabInstance:
       propertyPath: shootingModes.Array.data[2].fireRate
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 114642073701102404, guid: 8e33fda0c220936498f5288af83d7450,
+        type: 3}
+      propertyPath: shootingModes.Array.data[0].fireRate
+      value: 10.02
+      objectReference: {fileID: 0}
     - target: {fileID: 4540033449823964, guid: 8e33fda0c220936498f5288af83d7450, type: 3}
       propertyPath: m_LocalPosition.y
       value: 3.806
@@ -437,6 +442,11 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 212835588731536264, guid: 5a213a4dde83c404f8856922c5fc08ff,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5a213a4dde83c404f8856922c5fc08ff, type: 3}
 --- !u!1 &1417115244 stripped
@@ -480,6 +490,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44e57e76f7cf046a2a3916bf137ab9be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debugValue: 0
+  debugMaxGoalValue: 40
 --- !u!4 &1583801840
 Transform:
   m_ObjectHideFlags: 0

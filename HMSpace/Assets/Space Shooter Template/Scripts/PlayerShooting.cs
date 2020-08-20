@@ -13,7 +13,7 @@ using UnityEngine.SceneManagement;
 #region Serializable classes
 public enum ActiveShootingMode
 {
-    Short_Lazer, Swirling, Rocket, Ray
+    Short_Lazer, Swirling, Rocket, Ray, Photon
 }
 
 //serializable class describing all existing shooting modes
@@ -49,8 +49,8 @@ public class ChargingBar
 
 public class PlayerShooting : MonoBehaviour
 {
-
-    public float percentage = 0.50f; // To be set by the clinician (used only in level 2)
+    public GameObject charge = null;
+    public float percentage = 1f; // To be set by the clinician (used only in level 2)
     public float threshold = 10f;
     public ActiveShootingMode activeShootingMode;
 
@@ -86,6 +86,7 @@ public class PlayerShooting : MonoBehaviour
             {
                 Debug.Log("found");
             }
+            charge.SetActive(true);
             chargingBarImage = GameObject.Find("ChargingBar").GetComponent<Image>();//set the health to 3 and update the health bar
             chargingBarImage.sprite = chargingBarSprites.charged_0;
             StaticEMG.Instance.EMG.setGoal(15);
@@ -143,6 +144,9 @@ public class PlayerShooting : MonoBehaviour
                     break;
             }
 
+            charge.SetActive(true);
+            charge.transform.localScale = new Vector3(actualMPercentage, actualMPercentage, actualMPercentage);
+
             if (actualMPercentage <= percentage + threshold && actualMPercentage >= percentage - threshold)
             {
                 int mode = (int)activeShootingMode;  //defining active shooting mode index
@@ -164,6 +168,7 @@ public class PlayerShooting : MonoBehaviour
                         shootingModes[mode].nextFire = Time.time + 4f / shootingModes[mode].fireRate;
                     }
                 }
+                charge.SetActive(false);
             }
         }
     }
@@ -243,7 +248,17 @@ public class PlayerShooting : MonoBehaviour
                             guns.PlayerRay.SetActive(true);
                         break;
                     }
-                #endregion*/
+                #endregion
+                #region Photon Charge
+                case ActiveShootingMode.Photon:
+                    {
+                        if (guns.PlayerRay.activeSelf)
+                            guns.PlayerRay.SetActive(false);
+                        Instantiate(shootingModes[(int)activeShootingMode].projectileObject, guns.centralGun.transform.position, guns.centralGun.transform.rotation);
+                        SoundManager.instance.PlaySound("swirling");
+                        break;
+                    }
+                #endregion
                 default:
                     break;
             }
