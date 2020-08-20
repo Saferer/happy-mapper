@@ -79,13 +79,8 @@ public class PlayerShooting : MonoBehaviour
         guns.leftGunVFX = guns.leftGun.GetComponent<ParticleSystem>();
         guns.rightGunVFX = guns.rightGun.GetComponent<ParticleSystem>();
         guns.centralGunVFX = guns.centralGun.GetComponent<ParticleSystem>();
-        if (SceneManager.GetActiveScene().name == "Level2")
+        if (SceneManager.GetActiveScene().name == "Level_2")
         {
-            Debug.Log("ok");
-            if (!GameObject.Find("ChargingBar"))
-            {
-                Debug.Log("found");
-            }
             charge.SetActive(true);
             chargingBarImage = GameObject.Find("ChargingBar").GetComponent<Image>();//set the health to 3 and update the health bar
             chargingBarImage.sprite = chargingBarSprites.charged_0;
@@ -97,7 +92,7 @@ public class PlayerShooting : MonoBehaviour
     private void Update()
     {
 
-        if (SceneManager.GetActiveScene().name == "Demo_Scene")
+        if (SceneManager.GetActiveScene().name == "Level_1")
         {
             if (shootingIsActive)
             {
@@ -122,7 +117,7 @@ public class PlayerShooting : MonoBehaviour
                 }
             }
         }
-        if (SceneManager.GetActiveScene().name == "Level2")
+        if (SceneManager.GetActiveScene().name == "Level_2")
         {
             Debug.Log("in shooting");
             float actualMPercentage = (float)StaticEMG.Instance.EMG.getPercentage();

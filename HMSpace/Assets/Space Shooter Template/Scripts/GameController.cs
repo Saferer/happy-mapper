@@ -209,6 +209,6 @@ public class GameController : MonoBehaviour {
     public void OpenStartScreen()
     {
         Time.timeScale = 1;
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene("Levels_Menu");
     }
 }

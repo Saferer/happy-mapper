@@ -43,7 +43,7 @@ public class PlayerMoving : MonoBehaviour
     {
         mainCamera = Camera.main;
         ResizeBorders();//setting 'Player's' moving borders deending on Viewport's size
-        if (SceneManager.GetActiveScene().name == "Demo_Scene")
+        if (SceneManager.GetActiveScene().name == "Level_1")
         {
             StaticEMG.Instance.EMG.setGoal(35);
             StaticEMG.Run();
@@ -53,7 +53,7 @@ public class PlayerMoving : MonoBehaviour
     private void Update()
     {
         //new for player movement with EMG
-        if (SceneManager.GetActiveScene().name == "Demo_Scene")
+        if (SceneManager.GetActiveScene().name == "Level_1")
         {
             float offset = 10.24f;
             //Debug.Log((float)StaticEMG.Instance.EMG.getPercentage());
