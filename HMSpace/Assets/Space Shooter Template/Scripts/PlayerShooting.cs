@@ -160,6 +160,10 @@ public class PlayerShooting : MonoBehaviour
                         shootingModes[mode].nextFire = Time.time + 4f / shootingModes[mode].fireRate / weaponPower;
                     }
                 }
+                // else if(mode == (int)ActiveShootingMode.Photon)
+                // {
+                //     if ()
+                // }
                 else
                 {
                     if (Time.time > shootingModes[mode].nextFire)

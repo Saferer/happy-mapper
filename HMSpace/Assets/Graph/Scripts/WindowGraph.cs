@@ -3,6 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public class BoolWrapper
+{
+    public bool value
+    {
+        get; set;
+    }
+    public BoolWrapper(bool value)
+    {
+        this.value = value;
+    }
+}
+
 public class WindowGraph : MonoBehaviour
 {
     [SerializeField] public Sprite circleSprite;
@@ -14,8 +26,9 @@ public class WindowGraph : MonoBehaviour
     private RectTransform dashMaxTemplate;
     private RectTransform dashMaxInst = null;
     private List<GameObject> gameObjectList;
-
-
+    private BoolWrapper recording;
+    private List<float> valueList;
+    public bool startRecording = false;
     private float yMaximum = 0;
     private float yMinimum = 0;
     [SerializeField] public Camera UICam;
@@ -23,31 +36,34 @@ public class WindowGraph : MonoBehaviour
     private void Awake()
     {
 
-
+        recording = new BoolWrapper(false);
         graphContainer = transform.Find("graphContainer").GetComponent<RectTransform>();
         labelTemplateX = graphContainer.Find("labelTemplateX").GetComponent<RectTransform>();
         labelTemplateY = graphContainer.Find("labelTemplateY").GetComponent<RectTransform>();
         dashTemplateX = graphContainer.Find("dashTemplateX").GetComponent<RectTransform>();
         dashMaxTemplate = graphContainer.Find("dashMax").GetComponent<RectTransform>();
         gameObjectList = new List<GameObject>();
-
-        // List<int> valueList = new List<int>() { 0, 100, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20, 99, 20, 56, 30, 22, 88, 77, 13, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20
+        //valueList = new List<float>() { 0, 100, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20, 99, 20, 56, 30, 22, 88, 77, 13, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20
         // , 100, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20, 99, 20, 56, 30, 22, 88, 77, 13, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20
         // , 100, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20, 99, 20, 56, 30, 22, 88, 77, 13, 20, 99, 20, 56, 30, 22, 88, 77, 13, 95, 86, 60, 66, 22, 59, 75, 5, 20};
-
-
-
+        valueList = new List<float>();
     }
 
     private void Start()
     {
-        List<float> valueList = new List<float>(MathConversionUtil.DoubleArrayToFloat(StaticEMG.Instance.EMG.getCalibrationArray()));
+        //List<float> valueList = new List<float>(MathConversionUtil.DoubleArrayToFloat(StaticEMG.Instance.EMG.getCalibrationArray()));
 
-        ShowGraph(valueList);
+
     }
 
     private void Update()
     {
+        if (startRecording)
+        {
+            Record(5);
+        }
+        if (recording.value)
+            ShowGraph(StaticEMG.Instance.GetRecordedValues());
         if (Input.GetMouseButton(0))
         {
             Vector2 localPoint;
@@ -86,7 +102,10 @@ public class WindowGraph : MonoBehaviour
 
     private void ShowGraph(List<float> valueList, int maxVisibleValueAmount = -1)
     {
-
+        if (valueList.Count < 1)
+        {
+            return;
+        }
         float graphWidth = graphContainer.sizeDelta.x;
         float graphHeight = graphContainer.sizeDelta.y;
         yMaximum = valueList[0];
@@ -192,5 +211,13 @@ public class WindowGraph : MonoBehaviour
         rectTransform.anchoredPosition = dotPosA + dir * distance * 0.5f;
         rectTransform.localEulerAngles = new Vector3(0, 0, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
         return gameObject;
+    }
+
+    private void Record(int timeSeconds)
+    {
+        StaticEMG.Instance.EMG.run();
+        recording.value = true;
+        startRecording = false;
+        StaticEMG.Instance.StartRecord(5, recording);
     }
 }

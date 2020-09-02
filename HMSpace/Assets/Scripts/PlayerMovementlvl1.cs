@@ -20,7 +20,7 @@ public class PlayerMovementlvl1 : MonoBehaviour
     public GameObject coin;
     public GameObject background;
     float desired = 10;
-    private float moveahead =0f;
+    private float moveahead = 0f;
     float yposition;
 
 
@@ -37,14 +37,14 @@ public class PlayerMovementlvl1 : MonoBehaviour
         //Console.ReadKey();
         //Debug.Log(yposition);
         float bgHeight = background.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
- }
+    }
 
-    void Update ()
+    void Update()
     {
 
         /// Moving
-        verticalMove =  (float)StaticEMG.Instance.EMG.getPercentage();
-        Debug.Log(verticalMove+"EMG");
+        verticalMove = (float)StaticEMG.Instance.EMG.getPercentage();
+        Debug.Log(verticalMove + "EMG");
         // Debug.Log(verticalMove);
         // if(verticalMove > 1f)
         // {
@@ -60,23 +60,26 @@ public class PlayerMovementlvl1 : MonoBehaviour
         //     GetComponent<Rigidbody2D>().AddForce(Vector3.up * 10f);
         // }
 
-        float actualMove = (background.GetComponent<SpriteRenderer>().sprite.bounds.size.y * verticalMove) -5.5f;
+        float actualMove = (background.GetComponent<SpriteRenderer>().sprite.bounds.size.y * verticalMove) - 5.5f;
 
-        if (actualMove < -5f){
+        if (actualMove < -5f)
+        {
 
-        GetComponent<Transform>().position=new Vector3(-1.94f+moveahead, -5f, 0f);
+            GetComponent<Transform>().position = new Vector3(-1.94f + moveahead, -5f, 0f);
 
-      }
-        else if (actualMove < 5f /*&& actualMove >- 6f*/){
-        //
-          //Debug.Log(actualMove);
-          GetComponent<Transform>().position= Vector3.Lerp(GetComponent<Transform>().position, new Vector3(-1.94f+moveahead, actualMove, 0f), .1f);}
+        }
+        else if (actualMove < 5f /*&& actualMove >- 6f*/)
+        {
+            //
+            //Debug.Log(actualMove);
+            GetComponent<Transform>().position = Vector3.Lerp(GetComponent<Transform>().position, new Vector3(-1.94f + moveahead, actualMove, 0f), .1f);
+        }
 
-          else {GetComponent<Transform>().position=new Vector3(-1.94f+moveahead, 5f, 0f);}
+        else { GetComponent<Transform>().position = new Vector3(-1.94f + moveahead, 5f, 0f); }
 
 
 
-        moveahead = moveahead+0.1f;
+        moveahead = moveahead + 0.1f;
         timer -= Time.deltaTime;
         if (timer <= 0f)
         {
@@ -84,15 +87,17 @@ public class PlayerMovementlvl1 : MonoBehaviour
             coin = coinClone;
             timer = Random.Range(0.2f, 1.3f);
         }
-        if (Input.GetKeyDown(KeyCode.Return)){
-          SceneManager.LoadScene("map");
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            SceneManager.LoadScene("map");
         }
-        if (Input.GetKeyDown(KeyCode.Escape)){
-          SceneManager.LoadScene("Menu");
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("Menu");
         }
     }
 
-    void fixedUpdate ()
+    void fixedUpdate()
     {
 
     }
@@ -101,7 +106,7 @@ public class PlayerMovementlvl1 : MonoBehaviour
     {
         if (other.gameObject.name.Contains("PickUpCoin"))
         {
-          other.gameObject.transform.localScale = new Vector3(0,0,0);
+            other.gameObject.transform.localScale = new Vector3(0, 0, 0);
             coinsCount = coinsCount + 1;
             SetCountText();
             //Destroy(other.gameObject);
