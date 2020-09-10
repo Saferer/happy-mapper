@@ -65,7 +65,7 @@ public class Enemy : MonoBehaviour {
     {
         health -= damage;           //reducing health for damage value, if health is less than 0, starting destruction procedure
         if (health <= 0) 
-            Destruction();
+            Destruction(true);
     }
 
     //method of getting damage, if damage is received from weapon 'Ray'
@@ -75,7 +75,7 @@ public class Enemy : MonoBehaviour {
         {
             health -= damage;           //if health less than 0, starting destruction procedure; if not, generating 'hit effect' and setting time for the next damage
             if (health <= 0)
-                Destruction();
+                Destruction(true);
             else
             {
                 GameObject newHitFx = PoolingController.instance.GetPoolingObject(hitRayEffect);
@@ -100,14 +100,17 @@ public class Enemy : MonoBehaviour {
         if (collision.tag == "Boundary")
         {
             Debug.Log("touched");
-            Destruction();
+            Destruction(false);
         }
     }
 
     //method of destroying the 'Enemy'
-    void Destruction()                           
+    void Destruction(bool scored)
     {
-        GameController.instance.AddScore(scoreReward);              //adding 'Player's' points
+        if (scored)
+        {
+            GameController.instance.AddScore(scoreReward);              //adding 'Player's' points
+        }
         if (destructionVFX.GetComponent<VisualEffect>().isPooled) //generating destruction visual effect
         {
             GameObject newVfx = PoolingController.instance.GetPoolingObject(destructionVFX);

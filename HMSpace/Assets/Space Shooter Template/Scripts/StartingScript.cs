@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 
 /// <summary>
@@ -14,6 +15,7 @@ public class StartingScript : MonoBehaviour {
     public Sprite loadingButtonSprite;
     public GameObject SettingsButton, MusicButton, SoundButton;
     public Sprite MusicOnSprite, MusicOffSprite, SoundOnSprite, SoundOffSprite;
+    public Scene SceneToLoad;
     bool settingsAreOpen = false;
 
     private void Start()
@@ -32,8 +34,15 @@ public class StartingScript : MonoBehaviour {
     // Load the scene which is by index 1 in the builded scenes list
     public void LoadMainScene()
     {
-        playButton.GetComponent<Image>().sprite = loadingButtonSprite; 
-        SceneManager.LoadScene(1);
+        Debug.Log(EventSystem.current.currentSelectedGameObject.name);
+        if (EventSystem.current.currentSelectedGameObject.name == "Level1"){
+            SceneManager.LoadScene("Level_1");
+        }
+        if (EventSystem.current.currentSelectedGameObject.name == "Level2")
+        {
+            SceneManager.LoadScene("Level_2");
+        }
+
     }
 
     public void OpenSettings ()
