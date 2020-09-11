@@ -28,7 +28,7 @@ public class WindowGraph : MonoBehaviour
     private List<GameObject> gameObjectList;
     private BoolWrapper recording;
     private List<float> valueList;
-    public bool startRecording = false;
+    //public bool startRecording = false;
     private float yMaximum = 0;
     private float yMinimum = 0;
     [SerializeField] public Camera UICam;
@@ -58,10 +58,10 @@ public class WindowGraph : MonoBehaviour
 
     private void Update()
     {
-        if (startRecording)
-        {
-            Record(5);
-        }
+        // if (startRecording)
+        // {
+        //     Record(15);
+        // }
         if (recording.value)
             ShowGraph(StaticEMG.Instance.GetRecordedValues());
         if (Input.GetMouseButton(0))
@@ -144,8 +144,8 @@ public class WindowGraph : MonoBehaviour
         {
             yDifference = 5f;
         }
-        yMaximum = yMaximum + ((yDifference) * 0.1f);
-        yMinimum = yMinimum - ((yDifference) * 0.1f);
+        //yMaximum = yMaximum + ((yDifference) * 0.1f);
+        //yMinimum = yMinimum - ((yDifference) * 0.1f);
 
 
 
@@ -184,7 +184,7 @@ public class WindowGraph : MonoBehaviour
             labelY.gameObject.SetActive(true);
             float normalizedValue = j * 1f / separatorCount;
             labelY.anchoredPosition = new Vector2(-20f, normalizedValue * graphHeight);
-            labelY.GetComponent<Text>().text = string.Format("{0:0.00}", yMinimum + (normalizedValue * (yMaximum - yMinimum)));
+            labelY.GetComponent<Text>().text = string.Format("{0:0.00}", (float)j / separatorCount);//string.Format("{0:0.00}", yMinimum + (normalizedValue * (yMaximum - yMinimum)));
             labelY.localScale = new Vector2(1, 1);
             gameObjectList.Add(labelY.gameObject);
 
@@ -213,11 +213,12 @@ public class WindowGraph : MonoBehaviour
         return gameObject;
     }
 
-    private void Record(int timeSeconds)
+    public void Record(int timeSeconds)
     {
         StaticEMG.Instance.EMG.run();
         recording.value = true;
-        startRecording = false;
-        StaticEMG.Instance.StartRecord(5, recording);
+        //startRecording = false;
+        StaticEMG.Instance.StartRecord(timeSeconds, recording);
     }
+
 }

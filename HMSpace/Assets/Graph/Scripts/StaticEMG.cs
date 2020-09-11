@@ -121,8 +121,10 @@ public class StaticEMG : MonoBehaviour
         {
             Debug.Log(debugValue + ":" + StaticEMG.Instance.signal.value);
             debugRecorded.Add((float)debugValue);
-            Thread.Sleep(250);
+            Thread.Sleep(50);
         }
         StaticEMG.Instance.signal.value = false;
     }
+
+
 }
