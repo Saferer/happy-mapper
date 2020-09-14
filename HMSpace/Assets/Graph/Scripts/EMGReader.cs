@@ -5,6 +5,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.IO.Ports;
 using System.IO;
+using System.Threading;
+using SYSTEM = System.Diagnostics;
+
 
 
 namespace I4HUSB
@@ -25,7 +28,17 @@ namespace I4HUSB
         private double RATE = 252f; // hz
         private double CALIBRATION_TIME = 5; //seconds
         private bool debugMode = false;
+        private bool record = false;
+        private List<float> recordedValues;
+        private long timeToRecord;
+        private SYSTEM.Stopwatch stopwatch;
+        private Mutex mut;
+
+        private BoolWrapper signal;
         //Constructor
+
+
+        private float[] calibrationResults;
         public EMGReader(bool debug = false)
         {
             debugMode = debug;
@@ -50,6 +63,9 @@ namespace I4HUSB
 
             int size = (int)Math.Round(RATE * AVERAGE_PERIOD);
             pastValues = new double[size];
+            mut = new Mutex();
+            recordedValues = new List<float>();
+            stopwatch = new SYSTEM.Stopwatch();
 
         }
 
@@ -100,7 +116,17 @@ namespace I4HUSB
 
                             pastValues[pastIndex++] = average;
                             calculateRunningAverage(average);
-
+                            if (record)
+                            {
+                                mut.WaitOne();
+                                recordedValues.Add((float)runningAverage);
+                                signal.value = false;
+                                mut.ReleaseMutex();
+                                if (stopwatch.ElapsedMilliseconds > timeToRecord)
+                                {
+                                    stopwatch.Stop();
+                                }
+                            }
                             if (pastIndex >= pastValues.Length)
                             {
                                 pastIndex = 0;
@@ -191,6 +217,24 @@ namespace I4HUSB
 
         }
 
+        public void StartRecord(int time, BoolWrapper signal)
+        {
+            record = true;
+            recordedValues = new List<float>();
+            this.signal = signal;
+            timeToRecord = time * 1000;
+            stopwatch.Reset();
+            stopwatch.Start();
+        }
+
+        public List<float> GetRecordedValues()
+        {
+            mut.WaitOne();
+            List<float> copy = new List<float>(recordedValues);
+            mut.ReleaseMutex();
+            return copy;
+        }
+
         //**DEPRECATED** -- Use getCalibrationArray() and then setGoal
         //Starts Calibration for measuring maximum
         /*
@@ -261,76 +305,77 @@ namespace I4HUSB
 
         }*/
 
+        //**ALSO DECAPRECATED CALIBRATION SHALL BE HANDLED BY GAME CLIETN INSTEAD
         //Use instead of calibrateMax to get data for the next CALIBRATION_TIME seconds
-        public double[] getCalibrationArray()
-        {
-            serialPort.DiscardInBuffer();
-            int rounded = (int)Math.Round(CALIBRATION_TIME * RATE);
-            double[] runningArray = new double[rounded];
-            int currentIndex = 0;
-            for (int i = 0; i < CALIBRATION_TIME * RATE; i++)
-            {
-                while (true)
-                {
-                    //Console.WriteLine(i);
-                    packetBytes[0] = serialPort.ReadByte();
-                    if (packetBytes[0] == 0xa5)
-                    {
-                        //Console.WriteLine("Found a5");
-                        packetBytes[1] = serialPort.ReadByte();
-                        if (packetBytes[1] == 0x5a)
-                        {
-                            //Console.WriteLine("Found 5a");
-                            break;
-                        }
+        // public double[] getCalibrationArray()
+        // {
+        //     serialPort.DiscardInBuffer();
+        //     int rounded = (int)Math.Round(CALIBRATION_TIME * RATE);
+        //     double[] runningArray = new double[rounded];
+        //     int currentIndex = 0;
+        //     for (int i = 0; i < CALIBRATION_TIME * RATE; i++)
+        //     {
+        //         while (true)
+        //         {
+        //             //Console.WriteLine(i);
+        //             packetBytes[0] = serialPort.ReadByte();
+        //             if (packetBytes[0] == 0xa5)
+        //             {
+        //                 //Console.WriteLine("Found a5");
+        //                 packetBytes[1] = serialPort.ReadByte();
+        //                 if (packetBytes[1] == 0x5a)
+        //                 {
+        //                     //Console.WriteLine("Found 5a");
+        //                     break;
+        //                 }
 
-                    }
-                }
-                while (true)
-                {
+        //             }
+        //         }
+        //         while (true)
+        //         {
 
-                    if (index > 16)
-                    {
-                        double[] channels = new double[6];
-                        double average = 0;
-                        for (int j = 0; j < channels.Length; j += 2)
-                        {
-                            channels[j] = transform((int)(packetBytes[j + 4] << 8 | packetBytes[j + 5]));
-                            average += channels[j];
-                        }
+        //             if (index > 16)
+        //             {
+        //                 double[] channels = new double[6];
+        //                 double average = 0;
+        //                 for (int j = 0; j < channels.Length; j += 2)
+        //                 {
+        //                     channels[j] = transform((int)(packetBytes[j + 4] << 8 | packetBytes[j + 5]));
+        //                     average += channels[j];
+        //                 }
 
-                        /*
-                        Console.WriteLine(packetBytes[4] << 8 | packetBytes[5]);
-                        Console.WriteLine(packetBytes[6] << 8 | packetBytes[7]);
-                        Console.WriteLine(packetBytes[8] << 8 | packetBytes[9]);
-                        */
-                        average /= channels.Length;
-                        //max = average > max ? average : max;
-                        deletedValue = pastValues[pastIndex];
+        //                 /*
+        //                 Console.WriteLine(packetBytes[4] << 8 | packetBytes[5]);
+        //                 Console.WriteLine(packetBytes[6] << 8 | packetBytes[7]);
+        //                 Console.WriteLine(packetBytes[8] << 8 | packetBytes[9]);
+        //                 */
+        //                 average /= channels.Length;
+        //                 //max = average > max ? average : max;
+        //                 deletedValue = pastValues[pastIndex];
 
-                        pastValues[pastIndex++] = average;
-                        calculateRunningAverage(average);
+        //                 pastValues[pastIndex++] = average;
+        //                 calculateRunningAverage(average);
 
-                        if (pastIndex >= pastValues.Length)
-                        {
-                            pastIndex = 0;
-                        }
+        //                 if (pastIndex >= pastValues.Length)
+        //                 {
+        //                     pastIndex = 0;
+        //                 }
 
-                        runningArray[currentIndex++] = this.runningAverage;
+        //                 runningArray[currentIndex++] = this.runningAverage;
 
-                        index = 2;
-                        break;
-                    }
-                    packetBytes[index++] = serialPort.ReadByte();
+        //                 index = 2;
+        //                 break;
+        //             }
+        //             packetBytes[index++] = serialPort.ReadByte();
 
 
 
-                }
-            }
+        //         }
+        //     }
 
-            return runningArray;
+        //     return runningArray;
 
-        }
+        // }
 
 
 
