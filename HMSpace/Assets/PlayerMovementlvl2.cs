@@ -22,7 +22,7 @@ public class PlayerMovementlvl2 : MonoBehaviour
     public GameObject background;
     public GameObject reader;
     float desired = 10;
-    private float moveahead =0f;
+    private float moveahead = 0f;
     float yposition;
 
 
@@ -30,24 +30,24 @@ public class PlayerMovementlvl2 : MonoBehaviour
     {
 
 
-      StaticEMG.Run();
+        StaticEMG.Run();
         controller = GetComponent<CharacterController2D>();
         coinsCount = 0;
         SetCountText();
         anim = GetComponent<Animator>();
         transform = GetComponent<Transform>();
         // EMGReader readIn = new EMGReader();
-          yposition = -8f;//background.GetComponent<Transform>().position.y - (background.GetComponent<SpriteRenderer>().sprite.bounds.size.y /2);
+        yposition = -8f;//background.GetComponent<Transform>().position.y - (background.GetComponent<SpriteRenderer>().sprite.bounds.size.y /2);
         //Debug.Log(yposition);
         float bgHeight = background.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
- }
+    }
 
-    void Update ()
+    void Update()
     {
 
         /// Moving
-        verticalMove =  (float)StaticEMG.Instance.EMG.getPercentage();
-         Debug.Log(verticalMove+"EMG");
+        verticalMove = (float)StaticEMG.Instance.EMG.getPercentage();
+        Debug.Log(verticalMove + "EMG");
         // Debug.Log(verticalMove);
         // if(verticalMove > 1f)
         // {
@@ -63,34 +63,40 @@ public class PlayerMovementlvl2 : MonoBehaviour
         //     GetComponent<Rigidbody2D>().AddForce(Vector3.up * 10f);
         // }
 
-        float actualMove = (background.GetComponent<SpriteRenderer>().sprite.bounds.size.y * verticalMove) -5.5f;
+        float actualMove = (background.GetComponent<SpriteRenderer>().sprite.bounds.size.y * verticalMove) - 5.5f;
 
-        if (actualMove < -5f){
+        if (actualMove < -5f)
+        {
 
-        GetComponent<Transform>().position=new Vector3(-1.94f+moveahead, -5f, 0f);
+            GetComponent<Transform>().position = new Vector3(-1.94f + moveahead, -5f, 0f);
 
-      }
-        else if (actualMove < 5f /*&& actualMove >- 6f*/){
-        //
-          //Debug.Log(actualMove);
-          GetComponent<Transform>().position= Vector3.Lerp(GetComponent<Transform>().position, new Vector3(-1.94f+moveahead, actualMove, 0f), .1f);}
+        }
+        else if (actualMove < 5f /*&& actualMove >- 6f*/)
+        {
+            //
+            //Debug.Log(actualMove);
+            GetComponent<Transform>().position = Vector3.Lerp(GetComponent<Transform>().position, new Vector3(-1.94f + moveahead, actualMove, 0f), .1f);
+        }
 
-          else {GetComponent<Transform>().position=new Vector3(-1.94f+moveahead, 5f, 0f);}
+        else { GetComponent<Transform>().position = new Vector3(-1.94f + moveahead, 5f, 0f); }
 
 
-          moveahead = moveahead+0.1f;
+        moveahead = moveahead + 0.1f;
         timer -= Time.deltaTime;
-        if (Input.GetKeyDown(KeyCode.Space)){
-          Debug.Log("pressed");
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log("pressed");
             coinClone = Instantiate(coin);
-            coinClone.gameObject.transform.localScale = new Vector3(.5f,.5f,.5f);
+            coinClone.gameObject.transform.localScale = new Vector3(.5f, .5f, .5f);
             //coin = coinClone;
         }
-        if (Input.GetKeyDown(KeyCode.Return)){
-          SceneManager.LoadScene("map");
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            SceneManager.LoadScene("map");
         }
-        if (Input.GetKeyDown(KeyCode.Escape)){
-          SceneManager.LoadScene("Menu");
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("Menu");
         }
     }
 
@@ -99,7 +105,7 @@ public class PlayerMovementlvl2 : MonoBehaviour
     {
         if (other.gameObject.name.Contains("PickUpCoin"))
         {
-          other.gameObject.transform.localScale = new Vector3(0,0,0);
+            other.gameObject.transform.localScale = new Vector3(0, 0, 0);
             coinsCount = coinsCount + 1;
             SetCountText();
             //Destroy(other.gameObject);
