@@ -7,10 +7,9 @@ public class PlayerController : MonoBehaviour
     private Vector3 ScreenTopPosition;
 
     private Vector3 ScreenBotPosition;
-    private float MinimumPositionOffset = 1.3f;
+    private float MinimumPositionOffset = 1.2f;
     private float MaximumPositionOffset = 0.5f;
     private float Speed = 10.0f;
-    private float LastFrameTime = 0;
     private Animator animator;
 
     // Start is called before the first frame update
@@ -29,6 +28,15 @@ public class PlayerController : MonoBehaviour
         MovePlayer();
     }
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Coin"))
+        {
+            RedCoinScore.Instance.increment();
+            Destroy(other.gameObject);
+        }
+    }
+
     void MovePlayer()
     {
         //Use camera as ratio and offset by amount to allow for flooring the character
@@ -37,8 +45,7 @@ public class PlayerController : MonoBehaviour
         Vector3 newPos = new Vector3(transform.position.x, newYPos, transform.position.z);
         SetAnimation(newPos.y - oldPos.y);
         float dist = Vector3.Distance(newPos, oldPos);
-        float distToCover = (Time.time - LastFrameTime) * Speed;
-        LastFrameTime = Time.time;
+        float distToCover = (Time.deltaTime) * Speed;
         transform.position = Vector3.Lerp(oldPos, newPos, distToCover / dist);
     }
 
