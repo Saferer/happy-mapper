@@ -134,17 +134,29 @@ public class PlayerShooting : MonoBehaviour
                 case float n when (n > 0.5 * percentage && n <= 0.8 * percentage):
                     chargingBarImage.sprite = chargingBarSprites.charged_2;
                     break;
-                case float n when (n > 0.8 * percentage && n <= percentage + 0.2 * percentage):
+                case float n when (n > 0.8 * percentage): //&& n <= percentage + 0.2 * percentage):
                     chargingBarImage.sprite = chargingBarSprites.charged_3;
                     break;
             }
+            //defining active shooting mode index
 
-            charge.SetActive(true);
+            int mode = (int)activeShootingMode;
+            if (mode == (int)ActiveShootingMode.Photon)
+            {
+                charge.SetActive(true);
+
+            }
+            else
+            {
+                charge.SetActive(false);
+            }
             charge.transform.localScale = new Vector3(actualMPercentage, actualMPercentage, actualMPercentage);
 
-            if (actualMPercentage <= percentage + threshold && actualMPercentage >= percentage - threshold)
+
+            if (actualMPercentage >= percentage - threshold) // && actualMPercentage <= percentage + threshold )
             {
-                int mode = (int)activeShootingMode;  //defining active shooting mode index
+
+
                 if (mode == (int)ActiveShootingMode.Ray) //if active shooting mode is ray, making a shot at once; if not, checking if the time for the next shot comes
                     MakeAShot();
                 else if (mode == (int)ActiveShootingMode.Rocket) //if active shooting mode is rocket, shooting time depends on current weapon power
@@ -155,10 +167,6 @@ public class PlayerShooting : MonoBehaviour
                         shootingModes[mode].nextFire = Time.time + 4f / shootingModes[mode].fireRate / weaponPower;
                     }
                 }
-                // else if(mode == (int)ActiveShootingMode.Photon)
-                // {
-                //     if ()
-                // }
                 else
                 {
                     if (Time.time > shootingModes[mode].nextFire)

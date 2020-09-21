@@ -5,9 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
-    path: Assets/Space Shooter Template/Scenes/Start_Screen.unity
-    guid: 95a3096eb315b974b96008aff5ed5fc4
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/GameFiles/Sections/Space/Level_1.unity
     guid: d31945966fedec24fa8cf028f485e539
