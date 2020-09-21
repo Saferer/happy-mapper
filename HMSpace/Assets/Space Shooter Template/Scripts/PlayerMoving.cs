@@ -31,6 +31,7 @@ public class PlayerMoving : MonoBehaviour
     [HideInInspector] public bool controlIsActive = false;
     public GameObject background;
 
+
     public static PlayerMoving instance; //unique instance of the script for easy access to the script
 
     private void Awake()
@@ -59,16 +60,18 @@ public class PlayerMoving : MonoBehaviour
             //Debug.Log((float)StaticEMG.Instance.EMG.getPercentage());
             float actualMove = (float)(-(StaticEMG.Instance.EMG.getPercentage() * background.GetComponent<SpriteRenderer>().sprite.bounds.size.x)) / 2;
 
-
-            Debug.Log(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2);
-
-            if (actualMove > background.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2)
+            Debug.Log(background.GetComponent<SpriteRenderer>().sprite.rect.position.x - background.GetComponent<SpriteRenderer>().sprite.rect.width / 2);
+            //Debug.Log(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2);
+            float leftBound = background.GetComponent<SpriteRenderer>().sprite.rect.position.x - background.GetComponent<SpriteRenderer>().sprite.rect.width / 2;
+            if (actualMove > 0)
             {
+                Debug.Log("here");
                 GetComponent<Transform>().position = new Vector3(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2, -7.5f, 0);
             }
-            else if (actualMove < -(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2))
+            else if (actualMove < leftBound)
             {
-                GetComponent<Transform>().position = new Vector3(-(background.GetComponent<SpriteRenderer>().sprite.bounds.size.x / 2), -7.5f, 0);
+
+                GetComponent<Transform>().position = new Vector3(leftBound, -7.5f, 0);
             }
             else
             {
@@ -99,53 +102,53 @@ public class PlayerMoving : MonoBehaviour
 
         //Old code from original game
 
-        if (controlIsActive)
-        {
-#if UNITY_STANDALONE || UNITY_EDITOR || UNITY_WEBGL   //if the current platform is not mobile, setting mouse handling
+        //         if (controlIsActive)
+        //         {
+        // #if UNITY_STANDALONE || UNITY_EDITOR || UNITY_WEBGL   //if the current platform is not mobile, setting mouse handling
 
-            if (Input.GetMouseButton(0)) //if mouse button was pressed
-            {
-                Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition); //calculating mouse position in the worldspace
-                mousePosition.z = transform.position.z;
-                if (handlingType == HandlingType.offset) //if handling type 'offset', moving the object considering distance to pointer, if not, moving the object to pointer position
-                {
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        distanseToPointer = mousePosition - transform.position;
-                    }
-                    transform.position = mousePosition - distanseToPointer;
-                }
-                else if (handlingType == HandlingType.pointerPosition)
-                    transform.position = Vector3.MoveTowards(transform.position, mousePosition, 30 * Time.deltaTime);
-            }
-#endif
+        //             if (Input.GetMouseButton(0)) //if mouse button was pressed
+        //             {
+        //                 Vector3 mousePosition = mainCamera.ScreenToWorldPoint(Input.mousePosition); //calculating mouse position in the worldspace
+        //                 mousePosition.z = transform.position.z;
+        //                 if (handlingType == HandlingType.offset) //if handling type 'offset', moving the object considering distance to pointer, if not, moving the object to pointer position
+        //                 {
+        //                     if (Input.GetMouseButtonDown(0))
+        //                     {
+        //                         distanseToPointer = mousePosition - transform.position;
+        //                     }
+        //                     transform.position = mousePosition - distanseToPointer;
+        //                 }
+        //                 else if (handlingType == HandlingType.pointerPosition)
+        //                     transform.position = Vector3.MoveTowards(transform.position, mousePosition, 30 * Time.deltaTime);
+        //             }
+        // #endif
 
-#if UNITY_IOS || UNITY_ANDROID //if current platform is mobile,
+        // #if UNITY_IOS || UNITY_ANDROID //if current platform is mobile,
 
-            if (Input.touchCount == 1) // if there is a touch
-            {
-                Touch touch = Input.touches[0];
-                Vector3 touchPosition = mainCamera.ScreenToWorldPoint(touch.position);  //calculating touch position in the world space
-                touchPosition.z = transform.position.z;
-                if (handlingType == HandlingType.offset) //if handling type 'offset', moving the object considering distance to pointer, if not, moving the object to pointer position
-                {
-                    if (touch.phase == TouchPhase.Began)
-                    {
-                        distanseToPointer = touchPosition - transform.position;
-                    }
-                    transform.position = touchPosition - distanseToPointer;
-                }
-                else if (handlingType == HandlingType.pointerPosition)
-                    transform.position = Vector3.MoveTowards(transform.position, touchPosition, 30 * Time.deltaTime);
-            }
-#endif
-            transform.position = new Vector3    //if 'Player' crossed the movement borders, returning him back
-                (
-                Mathf.Clamp(transform.position.x, borders.minX, borders.maxX),
-                Mathf.Clamp(transform.position.y, borders.minY, borders.maxY),
-                0
-                );
-        }
+        //             if (Input.touchCount == 1) // if there is a touch
+        //             {
+        //                 Touch touch = Input.touches[0];
+        //                 Vector3 touchPosition = mainCamera.ScreenToWorldPoint(touch.position);  //calculating touch position in the world space
+        //                 touchPosition.z = transform.position.z;
+        //                 if (handlingType == HandlingType.offset) //if handling type 'offset', moving the object considering distance to pointer, if not, moving the object to pointer position
+        //                 {
+        //                     if (touch.phase == TouchPhase.Began)
+        //                     {
+        //                         distanseToPointer = touchPosition - transform.position;
+        //                     }
+        //                     transform.position = touchPosition - distanseToPointer;
+        //                 }
+        //                 else if (handlingType == HandlingType.pointerPosition)
+        //                     transform.position = Vector3.MoveTowards(transform.position, touchPosition, 30 * Time.deltaTime);
+        //             }
+        // #endif
+        //             transform.position = new Vector3    //if 'Player' crossed the movement borders, returning him back
+        //                 (
+        //                 Mathf.Clamp(transform.position.x, borders.minX, borders.maxX),
+        //                 Mathf.Clamp(transform.position.y, borders.minY, borders.maxY),
+        //                 0
+        //                 );
+        //         }
     }
 
     //setting 'Player's' movement borders according to Viewport size and defined offset
