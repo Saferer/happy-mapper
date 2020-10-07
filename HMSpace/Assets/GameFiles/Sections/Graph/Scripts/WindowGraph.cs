@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class BoolWrapper
 {
@@ -32,6 +33,7 @@ public class WindowGraph : MonoBehaviour
     private float yMaximum = 0;
     private float yMinimum = 0;
     [SerializeField] public Camera UICam;
+    public TMP_InputField TimeToRecord;
 
     private void Awake()
     {
@@ -69,7 +71,7 @@ public class WindowGraph : MonoBehaviour
             Vector2 localPoint;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(graphContainer, Input.mousePosition, UICam, out localPoint);
             float yPos = ((localPoint.y) / graphContainer.sizeDelta.y) * (yMaximum - yMinimum) + yMinimum;
-            Debug.Log(yPos);
+            //Debug.Log(yPos);
             if (yPos < yMaximum && yPos > yMinimum)
             {
                 if (dashMaxInst == null)
@@ -213,11 +215,21 @@ public class WindowGraph : MonoBehaviour
         return gameObject;
     }
 
-    public void Record(int timeSeconds)
+    public void Record()
     {
         StaticEMG.Instance.EMG.run();
         recording.value = true;
         //startRecording = false;
+        int timeSeconds;
+        try
+        {
+            timeSeconds = int.Parse(TimeToRecord.text);
+        }
+        catch
+        {
+            timeSeconds = 0;
+        }
+
         StaticEMG.Instance.StartRecord(timeSeconds, recording);
     }
 
