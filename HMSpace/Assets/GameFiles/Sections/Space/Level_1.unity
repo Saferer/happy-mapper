@@ -490,10 +490,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9916b1a9e3011c349a067045737746f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugMode: 1
+  debugMode: 0
   debugValue: 0
   debugRecorded: []
-  debugMaxGoalValue: 50
+  debugMaxGoalValue: 0
 --- !u!4 &1583801840
 Transform:
   m_ObjectHideFlags: 0

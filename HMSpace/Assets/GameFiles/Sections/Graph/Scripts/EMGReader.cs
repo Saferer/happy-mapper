@@ -20,9 +20,9 @@ namespace I4HUSB
         private int pastIndex = 0;
         private double basepoint = 300;
         private int index = 2;
-        private double goal = 0;
+        private volatile float goal = 0;
         private double runningAverage = 0;
-        SerialPort serialPort;
+        SerialPort serialPort = null;
         private bool keepRunning = true;
         private double AVERAGE_PERIOD = 0.2;  // seconds
         private double RATE = 252f; // hz
@@ -33,6 +33,7 @@ namespace I4HUSB
         private long timeToRecord;
         private SYSTEM.Stopwatch stopwatch;
         private Mutex mut;
+        private Mutex mut2;
 
         private BoolWrapper signal;
         //Constructor
@@ -51,11 +52,11 @@ namespace I4HUSB
             }
             if (!debug)
             {
-                serialPort = new SerialPort("COM6", 57600, Parity.None);
-                if (!serialPort.IsOpen)
-                {
-                    serialPort.Open();
-                }
+                // serialPort = new SerialPort("COM6", 57600, Parity.None);
+                // if (!serialPort.IsOpen)
+                // {
+                //     serialPort.Open();
+                // }
             }
 
 
@@ -64,6 +65,7 @@ namespace I4HUSB
             int size = (int)Math.Round(RATE * AVERAGE_PERIOD);
             pastValues = new double[size];
             mut = new Mutex();
+            mut2 = new Mutex();
             recordedValues = new List<float>();
             stopwatch = new SYSTEM.Stopwatch();
 
@@ -72,12 +74,20 @@ namespace I4HUSB
         //Run this code on a serperate thread. This already loops so do not need to run this in loop
         public void run()
         {
+            if(serialPort == null)
+            {
+                Debug.Log("No port has been set");
+                return;
+            }
             if (!debugMode)
             {
-
+                if(!serialPort.IsOpen)
+                {
+                    serialPort.Open();
+                }
                 while (keepRunning)
                 {
-                    while (true)
+                    while (keepRunning)
                     {
                         packetBytes[0] = serialPort.ReadByte();
                         if (packetBytes[0] == 0xa5)
@@ -89,10 +99,9 @@ namespace I4HUSB
                                 //Console.WriteLine("Found 5a");
                                 break;
                             }
-
                         }
                     }
-                    while (true)
+                    while (keepRunning)
                     {
 
                         if (index > 16)
@@ -120,11 +129,12 @@ namespace I4HUSB
                             {
                                 mut.WaitOne();
                                 recordedValues.Add((float)runningAverage);
-                                signal.value = false;
                                 mut.ReleaseMutex();
                                 if (stopwatch.ElapsedMilliseconds > timeToRecord)
                                 {
                                     stopwatch.Stop();
+                                    record = false;
+                                    signal.value = false;
                                 }
                             }
                             if (pastIndex >= pastValues.Length)
@@ -136,7 +146,6 @@ namespace I4HUSB
                             break;
                         }
                         packetBytes[index++] = serialPort.ReadByte();
-
                     }
                 }
             }
@@ -161,8 +170,11 @@ namespace I4HUSB
         //Get measured ratio of current window compared to max with a range of (0,2)
         public double getPercentage()
         {
+            mut2.WaitOne();
             double result = (double)runningAverage / goal;
             if (result > 2) { result = 2; }
+            Debug.Log("EMGReader: GetPercentage: " + runningAverage + ":" + goal);
+            mut2.ReleaseMutex();
             return result;
         }
 
@@ -219,12 +231,16 @@ namespace I4HUSB
 
         public void StartRecord(int time, BoolWrapper signal)
         {
+            Debug.Log("EMGReader: StartRecord: Starting Function");
             record = true;
             recordedValues = new List<float>();
             this.signal = signal;
             timeToRecord = time * 1000;
             stopwatch.Reset();
             stopwatch.Start();
+            int size = (int)Math.Round(RATE * AVERAGE_PERIOD);
+            pastValues = new double[size];
+            Debug.Log("EMGReader: StartRecord: Leaving Function");
         }
 
         public List<float> GetRecordedValues()
@@ -235,7 +251,95 @@ namespace I4HUSB
             return copy;
         }
 
-        //**DEPRECATED** -- Use getCalibrationArray() and then setGoal
+        public void setFlag(bool val)
+        {
+            this.keepRunning = val;
+        }
+
+        public void setGoal(float goal)
+        {
+            mut2.WaitOne();
+            this.goal = goal;
+            Debug.Log("EMGReader: SetGoal: Goal is " + this.goal);
+            mut2.ReleaseMutex();
+        }
+        
+        public double getGoal()
+        {
+            mut2.WaitOne();
+            float result = this.goal;
+            mut2.ReleaseMutex();
+            if(this.goal == 0)
+            {
+                Debug.Log("EMGReader: GetGoal: Goal is still zero");
+            }
+            return result;
+        }
+        
+        public void close()
+        {
+            if (serialPort != null)
+            {
+                serialPort.Close();
+            }
+
+        }
+
+        public double RunningAverage
+        {
+            get { return runningAverage; }
+            set
+            {
+                if (debugMode)
+                {
+                    runningAverage = value;
+                }
+            }
+        }
+
+        public string[] GetPortNames()
+        {
+            return SerialPort.GetPortNames();
+        }
+
+        public void SetPort(string name)
+        {
+            if(serialPort != null && serialPort.IsOpen)
+            {
+                serialPort.Close();
+            }
+            Debug.Log("EMGReader: SetPort: Setting port to: " + name);
+            serialPort = new SerialPort(name, 57600, Parity.None);
+        }
+        //Main to test code
+        public static void Main(string[] args)
+        {
+            EMGReader test = new EMGReader();
+
+            Console.ReadLine();
+            //test.calibrateBase();
+            Console.WriteLine("Done");
+            Console.ReadLine();
+            // test.calibrateMax();
+            Console.WriteLine("Done");
+            Console.ReadLine();
+            test.run();
+        }
+
+        public void TestThis(EMGReader test)
+        {
+            if(test == this)
+            {
+                Debug.Log("EMGReader: TestThis: True!");
+            }
+            else
+            {
+                Debug.Log("EMGReader: TestThis: False!");
+            }
+        }
+    }
+
+            //**DEPRECATED** -- Use getCalibrationArray() and then setGoal
         //Starts Calibration for measuring maximum
         /*
         public void calibrateMax()
@@ -385,46 +489,4 @@ namespace I4HUSB
         {
             this.max = max;
         }*/
-
-        public void setFlag(bool val)
-        {
-            this.keepRunning = val;
-        }
-
-        public void setGoal(double goal)
-        {
-            this.goal = goal;
-        }
-
-        public void close()
-        {
-            serialPort.Close();
-        }
-
-        public double RunningAverage
-        {
-            get { return runningAverage; }
-            set
-            {
-                if (debugMode)
-                {
-                    runningAverage = value;
-                }
-            }
-        }
-        //Main to test code
-        public static void Main(string[] args)
-        {
-            EMGReader test = new EMGReader();
-
-            Console.ReadLine();
-            //test.calibrateBase();
-            Console.WriteLine("Done");
-            Console.ReadLine();
-            // test.calibrateMax();
-            Console.WriteLine("Done");
-            Console.ReadLine();
-            test.run();
-        }
-    }
 }

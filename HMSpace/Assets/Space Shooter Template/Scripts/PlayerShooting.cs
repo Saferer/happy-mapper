@@ -84,7 +84,7 @@ public class PlayerShooting : MonoBehaviour
             charge.SetActive(true);
             chargingBarImage = GameObject.Find("ChargingBar").GetComponent<Image>();//set the health to 3 and update the health bar
             chargingBarImage.sprite = chargingBarSprites.charged_0;
-            StaticEMG.Instance.EMG.setGoal(15);
+            //StaticEMG.Instance.EMG.setGoal(15);
             StaticEMG.Run();
         }
     }

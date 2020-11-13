@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class BoolWrapper
 {
@@ -34,6 +35,8 @@ public class WindowGraph : MonoBehaviour
     private float yMinimum = 0;
     [SerializeField] public Camera UICam;
     public TMP_InputField TimeToRecord;
+    public TMP_InputField MaxPercentageInput;
+    public TMP_Dropdown COMPortDropDown;
 
     private void Awake()
     {
@@ -54,6 +57,12 @@ public class WindowGraph : MonoBehaviour
     private void Start()
     {
         //List<float> valueList = new List<float>(MathConversionUtil.DoubleArrayToFloat(StaticEMG.Instance.EMG.getCalibrationArray()));
+        addDropDownOptions();
+        string[] ports = StaticEMG.Instance.EMG.GetPortNames();
+        if(ports.Length > 0)
+        {
+            StaticEMG.Instance.EMG.SetPort(ports[0]);
+        }
 
 
     }
@@ -64,6 +73,7 @@ public class WindowGraph : MonoBehaviour
         // {
         //     Record(15);
         // }
+        Debug.Log("WindowGraph: Update: Current Goal is " + StaticEMG.Instance.EMG.getGoal());
         if (recording.value)
             ShowGraph(StaticEMG.Instance.GetRecordedValues());
         if (Input.GetMouseButton(0))
@@ -80,6 +90,8 @@ public class WindowGraph : MonoBehaviour
                     dashMaxInst.SetParent(graphContainer, false);
                     dashMaxInst.gameObject.SetActive(true);
                 }
+                float percentageLabel = ((yPos - yMinimum) / (yMaximum - yMinimum)) * 100f;
+                MaxPercentageInput.text = percentageLabel.ToString("0.00");
                 StaticEMG.Instance.EMG.setGoal(yPos);
                 dashMaxInst.anchoredPosition = new Vector2(0, (yPos - yMinimum) / (yMaximum - yMinimum) * graphContainer.sizeDelta.y);
             }
@@ -154,7 +166,7 @@ public class WindowGraph : MonoBehaviour
         int xIndex = 0;
         float xSize = graphWidth / (maxVisibleValueAmount + 1);
         GameObject lastCircle = null;
-        for (int i = Mathf.Max(valueList.Count - maxVisibleValueAmount, 0); i < valueList.Count; i++)
+        for (int i = Mathf.Max(valueList.Count - maxVisibleValueAmount, 0); i < valueList.Count; i+=3)
         {
             float xPosition = xSize + xIndex * xSize;
             float yPosition = ((valueList[i] - yMinimum) / (yMaximum - yMinimum)) * graphHeight;
@@ -176,7 +188,7 @@ public class WindowGraph : MonoBehaviour
             labelX.transform.localPosition = new Vector3(labelX.transform.localPosition.x, labelX.transform.localPosition.y, 1);
             gameObjectList.Add(labelX.gameObject);*/
 
-            xIndex++;
+            xIndex+=3;
         }
         int separatorCount = 10;
         for (int j = 0; j <= separatorCount; j++)
@@ -217,7 +229,7 @@ public class WindowGraph : MonoBehaviour
 
     public void Record()
     {
-        StaticEMG.Instance.EMG.run();
+        StaticEMG.Run();
         recording.value = true;
         //startRecording = false;
         int timeSeconds;
@@ -229,8 +241,38 @@ public class WindowGraph : MonoBehaviour
         {
             timeSeconds = 0;
         }
-
+        Debug.Log("WindowGraph: Record: Starting Recording");
         StaticEMG.Instance.StartRecord(timeSeconds, recording);
     }
 
+    public void setMaxButton()
+    {
+        StaticEMG.Instance.EMG.setGoal((yMaximum - yMinimum) * (float.Parse(MaxPercentageInput.text) * 0.01f));
+        //Debug.Log(StaticEMG.Instance.EMG.getPercentage());
+        if (dashMaxInst == null)
+        {
+            dashMaxInst = Instantiate(dashMaxTemplate);
+            dashMaxInst.SetParent(graphContainer, false);
+            dashMaxInst.gameObject.SetActive(true);
+        }
+        dashMaxInst.anchoredPosition = new Vector2(0, ((float.Parse(MaxPercentageInput.text) * 0.01f) * graphContainer.sizeDelta.y));
+    }
+
+    public void addDropDownOptions()
+    {   
+        COMPortDropDown.ClearOptions();
+        COMPortDropDown.AddOptions(new List<string>(StaticEMG.Instance.EMG.GetPortNames()));
+    }
+
+    public void setCOMPort()
+    {
+        Debug.Log("WindowGraph: setCOMPort: Set called");
+        StaticEMG.Stop();
+        StaticEMG.Instance.EMG.SetPort(COMPortDropDown.options[COMPortDropDown.value].text);
+    }
+
+    public void accept()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
 }

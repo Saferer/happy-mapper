@@ -39,6 +39,7 @@ public class StaticEMG : MonoBehaviour
     {
         if (emg == null)
         {
+            Debug.Log("StaticEMG: Awake: Created EMG");
             emg = new EMGReader(debugMode);
         }
         if (instance != null && instance != this)
@@ -55,7 +56,7 @@ public class StaticEMG : MonoBehaviour
     private void Update()
     {
         Instance.EMG.RunningAverage = debugValue;
-        Instance.EMG.setGoal(debugMaxGoalValue);
+        //Instance.EMG.setGoal((float)debugMaxGoalValue);
     }
 
     public static void Run()
@@ -76,20 +77,25 @@ public class StaticEMG : MonoBehaviour
             Instance.EMG.setFlag(false);
             running = false;
             childThread.Join();
-
         }
     }
 
     public void StartRecord(int timeSeconds, BoolWrapper signal)
     {
         if (!debugMode)
+        {   
+            Debug.Log("StaticEMG: StartRecord: Starting");
             EMG.StartRecord(timeSeconds, signal);
-        Debug.Log("Started Debug Record");
-        debugRecorded = new List<float>();
-        debugTimer = timeSeconds * 1000;
-        this.signal = signal;
-        Thread debugThread = new Thread(DebugThreadRun);
-        debugThread.Start();
+        }
+        else
+        {
+            Debug.Log("Started Debug Record");
+            debugRecorded = new List<float>();
+            debugTimer = timeSeconds * 1000;
+            this.signal = signal;
+            Thread debugThread = new Thread(DebugThreadRun);
+            debugThread.Start();
+        }
     }
 
     public List<float> GetRecordedValues()

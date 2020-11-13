@@ -639,10 +639,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9916b1a9e3011c349a067045737746f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugMode: 1
+  debugMode: 0
   debugValue: 0
   debugRecorded: []
-  debugMaxGoalValue: 50
+  debugMaxGoalValue: 0
 --- !u!4 &1583801840
 Transform:
   m_ObjectHideFlags: 0
@@ -941,6 +941,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1716395637967292, guid: 4f6fbfb4736407a469384b33b391d005, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 224887251577391748, guid: 4f6fbfb4736407a469384b33b391d005,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1029,10 +1033,6 @@ PrefabInstance:
     - target: {fileID: 224887251577391748, guid: 4f6fbfb4736407a469384b33b391d005,
         type: 3}
       propertyPath: m_Pivot.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1716395637967292, guid: 4f6fbfb4736407a469384b33b391d005, type: 3}
-      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 114638534267593534, guid: 4f6fbfb4736407a469384b33b391d005,
