@@ -34,8 +34,9 @@ namespace I4HUSB
         private SYSTEM.Stopwatch stopwatch;
         private Mutex mut;
         private Mutex mut2;
-
+        private int number_of_values_in_past_values = 0;
         private BoolWrapper signal;
+        private double lowestvalue;
         //Constructor
 
 
@@ -121,14 +122,21 @@ namespace I4HUSB
                             */
                             average /= channels.Length;
                             //max = average > max ? average : max;
-                            deletedValue = pastValues[pastIndex];
-
+                            if(number_of_values_in_past_values > 0)
+                            {
+                                deletedValue = pastValues[pastIndex];
+                            }
+                            number_of_values_in_past_values++;
                             pastValues[pastIndex++] = average;
                             calculateRunningAverage(average);
                             if (record)
                             {
                                 mut.WaitOne();
-                                recordedValues.Add((float)runningAverage);
+                                if(number_of_values_in_past_values > (int)Math.Round(RATE * AVERAGE_PERIOD))
+                                {
+                                    Debug.Log("Added");
+                                    recordedValues.Add((float)runningAverage);
+                                }
                                 mut.ReleaseMutex();
                                 if (stopwatch.ElapsedMilliseconds > timeToRecord)
                                 {
@@ -163,15 +171,17 @@ namespace I4HUSB
         //Calculates window
         private void calculateRunningAverage(double newValue)
         {
+
             runningAverage += (newValue / pastValues.Length);
             runningAverage -= (deletedValue / pastValues.Length);
+            Debug.Log(runningAverage);
         }
 
         //Get measured ratio of current window compared to max with a range of (0,2)
         public double getPercentage()
         {
             mut2.WaitOne();
-            double result = (double)runningAverage / goal;
+            double result = (double)(runningAverage - lowestvalue) / (goal - lowestvalue);
             if (result > 2) { result = 2; }
             Debug.Log("EMGReader: GetPercentage: " + runningAverage + ":" + goal);
             mut2.ReleaseMutex();
@@ -232,6 +242,7 @@ namespace I4HUSB
         public void StartRecord(int time, BoolWrapper signal)
         {
             Debug.Log("EMGReader: StartRecord: Starting Function");
+            number_of_values_in_past_values = 0;
             record = true;
             recordedValues = new List<float>();
             this.signal = signal;
@@ -240,6 +251,7 @@ namespace I4HUSB
             stopwatch.Start();
             int size = (int)Math.Round(RATE * AVERAGE_PERIOD);
             pastValues = new double[size];
+            runningAverage = 0;
             Debug.Log("EMGReader: StartRecord: Leaving Function");
         }
 
@@ -294,6 +306,15 @@ namespace I4HUSB
                 {
                     runningAverage = value;
                 }
+            }
+        }
+
+        public double LowestValue
+        {
+            get { return lowestvalue; }
+            set
+            {
+                lowestvalue = value;
             }
         }
 

@@ -43,10 +43,10 @@ public class PlayerController : MonoBehaviour
         float newYPos = (ScreenTopPosition.y - ScreenBotPosition.y - MinimumPositionOffset) * 0.5f * (float)StaticEMG.Instance.GetPercentage() + ScreenBotPosition.y + MinimumPositionOffset;
         Vector3 oldPos = transform.position;
         Vector3 newPos = new Vector3(transform.position.x, newYPos, transform.position.z);
-        SetAnimation(newPos.y - oldPos.y);
         float dist = Vector3.Distance(newPos, oldPos);
         float distToCover = (Time.deltaTime) * Speed;
         transform.position = Vector3.Lerp(oldPos, newPos, distToCover / dist);
+        SetAnimation(newPos.y - oldPos.y);
     }
 
     void SetAnimation(float yDir)

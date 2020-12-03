@@ -93,6 +93,7 @@ public class WindowGraph : MonoBehaviour
                 float percentageLabel = ((yPos - yMinimum) / (yMaximum - yMinimum)) * 100f;
                 MaxPercentageInput.text = percentageLabel.ToString("0.00");
                 StaticEMG.Instance.EMG.setGoal(yPos);
+                StaticEMG.Instance.EMG.LowestValue = yMinimum;
                 dashMaxInst.anchoredPosition = new Vector2(0, (yPos - yMinimum) / (yMaximum - yMinimum) * graphContainer.sizeDelta.y);
             }
 
@@ -248,6 +249,7 @@ public class WindowGraph : MonoBehaviour
     public void setMaxButton()
     {
         StaticEMG.Instance.EMG.setGoal((yMaximum - yMinimum) * (float.Parse(MaxPercentageInput.text) * 0.01f));
+        StaticEMG.Instance.EMG.LowestValue = yMinimum;
         //Debug.Log(StaticEMG.Instance.EMG.getPercentage());
         if (dashMaxInst == null)
         {
