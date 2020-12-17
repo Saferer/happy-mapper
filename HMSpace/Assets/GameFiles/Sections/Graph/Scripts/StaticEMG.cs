@@ -55,8 +55,12 @@ public class StaticEMG : MonoBehaviour
 
     private void Update()
     {
-        Instance.EMG.RunningAverage = debugValue;
-        //Instance.EMG.setGoal((float)debugMaxGoalValue);
+        if(debugMode)
+        {
+            if (debugValue > 0)
+                Instance.EMG.RunningAverage = debugValue;
+            Instance.EMG.setGoal((float)debugMaxGoalValue);
+        }
     }
 
     public static void Run()
@@ -110,7 +114,10 @@ public class StaticEMG : MonoBehaviour
     {
         if (!debugMode)
             return EMG.getPercentage();
-        return debugValue / debugMaxGoalValue;
+        if (debugValue > 0)
+            return debugValue / debugMaxGoalValue;
+        return 0;
+        
     }
 
     public void OnApplicationQuit()

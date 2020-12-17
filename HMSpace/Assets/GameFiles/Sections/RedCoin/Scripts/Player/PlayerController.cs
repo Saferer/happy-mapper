@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
     private Vector3 ScreenTopPosition;
 
     private Vector3 ScreenBotPosition;
-    private float MinimumPositionOffset = 1.2f;
+    private float MinimumPositionOffset = 1.3f;
     private float MaximumPositionOffset = 0.5f;
     private float Speed = 10.0f;
     private Animator animator;
@@ -42,14 +42,16 @@ public class PlayerController : MonoBehaviour
         //Use camera as ratio and offset by amount to allow for flooring the character
         float newYPos = (ScreenTopPosition.y - ScreenBotPosition.y - MinimumPositionOffset) * 0.5f * (float)StaticEMG.Instance.GetPercentage() + ScreenBotPosition.y + MinimumPositionOffset;
         Vector3 oldPos = transform.position;
-        Vector3 newPos = new Vector3(transform.position.x, newYPos, transform.position.z);
+        Vector3 newPos;
+        newPos = new Vector3(transform.position.x, newYPos, transform.position.z);
         float dist = Vector3.Distance(newPos, oldPos);
         float distToCover = (Time.deltaTime) * Speed;
+        
         transform.position = Vector3.Lerp(oldPos, newPos, distToCover / dist);
-        SetAnimation(newPos.y - oldPos.y);
+        SetAnimation(newPos.y - oldPos.y, dist);
     }
 
-    void SetAnimation(float yDir)
+    void SetAnimation(float yDir, float dist)
     {
         if (StaticEMG.Instance.GetPercentage() < 0.07f)
         {
@@ -59,7 +61,7 @@ public class PlayerController : MonoBehaviour
         {
             animator.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("RedAnimation/Jump");
         }
-        else
+        else if (yDir < 0 && dist > 1.0f)
         {
             animator.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("RedAnimation/Fall");
         }
